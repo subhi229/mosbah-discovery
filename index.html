@@ -1,0 +1,1597 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0F3B3A">
+<title>Mosbah · Discovery deck v0.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;600;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --salt:#E3E8E3; --pearl:#F8F9F6; --ink:#0F3B3A; --ink-2:#3E5F5C; --line:#C5D0CA;
+  --olive:#6E7F2A; --olive-soft:#E4E9CF; --saffron:#D99A1E; --saffron-soft:#F6E7C4;
+  --pom:#B23A48; --pom-soft:#F3DADD; --sea:#2D6E8E; --sea-soft:#D7E6EE;
+  --display:"Alexandria",system-ui,sans-serif;
+  --body:"IBM Plex Sans Arabic","IBM Plex Sans",system-ui,sans-serif;
+  --naskh:"Noto Naskh Arabic",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+.ar{font-family:var(--naskh);direction:rtl;unicode-bidi:isolate;font-weight:500}
+
+/* ---------- stage ---------- */
+#viewport{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden}
+#stage{width:1600px;height:900px;position:relative;transform-origin:center center;background:var(--salt);border-radius:6px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.slide{position:absolute;inset:0;padding:64px 88px 84px 132px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s ease}
+.slide.active{opacity:1;visibility:visible;pointer-events:auto}
+@media (prefers-reduced-motion:reduce){.slide{transition:none}}
+
+/* rail */
+#rail{position:absolute;left:0;top:0;bottom:0;width:84px;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:28px 0 20px;gap:6px;z-index:5;background:var(--salt)}
+#rail .mark{font-family:var(--naskh);font-size:30px;font-weight:700;color:var(--ink);margin-bottom:18px;line-height:1}
+#rail button{width:60px;border:0;background:none;padding:8px 0;border-radius:8px;font-size:12.5px;line-height:1.15;color:var(--ink-2);text-align:center}
+#rail button .dot{display:block;width:8px;height:8px;border-radius:50%;margin:0 auto 5px;background:var(--line)}
+#rail button.on{color:var(--ink);font-weight:600}
+#rail button.on .dot{background:var(--saffron);transform:scale(1.4)}
+#rail .spacer{flex:1}
+#rail .tool{font-size:12px;color:var(--ink-2)}
+
+/* footer */
+#foot{position:absolute;left:84px;right:0;bottom:0;height:52px;display:flex;align-items:center;gap:18px;padding:0 28px 0 48px;font-size:15px;color:var(--ink-2);z-index:5}
+#bar{flex:1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+#bar i{display:block;height:100%;background:var(--ink);width:0;transition:width .3s}
+#foot .btn{border:1px solid var(--line);background:var(--pearl);border-radius:999px;padding:6px 14px;font-size:14px}
+#foot .btn:hover{border-color:var(--ink)}
+#count{font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
+
+/* ---------- type ---------- */
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.01em}
+h1{font-size:92px;font-weight:800;line-height:.98}
+h2{font-size:52px;font-weight:800;line-height:1.05;max-width:1250px}
+h3{font-size:26px;font-weight:600;line-height:1.2}
+p{margin:0}
+.kicker{font-size:19px;color:var(--ink-2);margin-bottom:14px}
+.lead{font-size:25px;line-height:1.45;max-width:1080px;color:var(--ink)}
+.small{font-size:18px;line-height:1.45;color:var(--ink-2)}
+.big-num{font-family:var(--display);font-weight:800;font-size:64px;line-height:1}
+.mt{margin-top:28px}.mt2{margin-top:44px}.mt-s{margin-top:14px}
+ul.clean{list-style:none;padding:0;margin:0}
+ul.ticks{padding-left:22px;margin:0}
+ul.ticks li{margin:8px 0;font-size:21px;line-height:1.4}
+b,strong{font-weight:600}
+
+/* ---------- layout helpers ---------- */
+.cols{display:grid;gap:28px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}.c4{grid-template-columns:repeat(4,1fr)}.c5{grid-template-columns:repeat(5,1fr)}
+.c-6-4{grid-template-columns:6fr 4fr}.c-4-6{grid-template-columns:4fr 6fr}
+.panel{background:var(--pearl);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+.panel h3{margin-bottom:10px}
+.panel p,.panel li{font-size:19.5px;line-height:1.45}
+.panel.olive{background:var(--olive-soft);border-color:#C9D2A3}
+.panel.saffron{background:var(--saffron-soft);border-color:#EACF8F}
+.panel.pom{background:var(--pom-soft);border-color:#E3B5BB}
+.panel.sea{background:var(--sea-soft);border-color:#B5CFDD}
+.panel.ink{background:var(--ink);color:var(--pearl);border-color:var(--ink)}
+.panel.ink .small{color:#B9CDC9}
+.rule-top{border-top:2px solid var(--ink);padding-top:14px}
+
+/* honesty tags */
+.tag{display:inline-block;font-size:13px;font-weight:600;border-radius:5px;padding:2px 7px;vertical-align:2px;margin-left:6px;white-space:nowrap}
+.t-data{background:var(--sea-soft);color:#1F5470}
+.t-est{background:var(--saffron-soft);color:#7A5208}
+.t-asm{background:var(--pom-soft);color:#8A2532}
+.t-op{background:#E2E2EE;color:#3C3C6A}
+
+/* tables */
+table.grid{border-collapse:collapse;width:100%;font-size:18px;line-height:1.38}
+table.grid th{font-family:var(--display);font-weight:600;font-size:15px;text-align:left;color:var(--ink-2);border-bottom:2px solid var(--ink);padding:8px 10px}
+table.grid td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.grid tr:hover td{background:rgba(255,255,255,.55)}
+table.grid td:first-child{font-weight:600}
+
+/* tabs */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tabs button{border:1px solid var(--line);background:var(--pearl);border-radius:999px;padding:8px 18px;font-size:17px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--pearl);border-color:var(--ink)}
+.tabpanel{display:none}.tabpanel.on{display:block}
+
+/* sources + slide notes drawer */
+.src-btn{position:absolute;right:28px;top:22px;border:1px solid var(--line);background:var(--pearl);border-radius:999px;padding:5px 13px;font-size:13.5px;color:var(--ink-2);z-index:4}
+.src{display:none;position:absolute;right:28px;top:58px;width:560px;max-height:640px;overflow:auto;background:var(--pearl);border:1px solid var(--ink);border-radius:12px;padding:16px 18px;font-size:14px;line-height:1.5;z-index:6;box-shadow:0 18px 40px rgba(15,59,58,.18)}
+.src.open{display:block}
+.src a{color:var(--sea);word-break:break-word}
+.src li{margin:4px 0}
+
+#notes{position:absolute;right:24px;bottom:62px;width:470px;background:var(--pearl);border:1px solid var(--ink);border-radius:12px;padding:14px;z-index:7;display:none;box-shadow:0 18px 40px rgba(15,59,58,.2)}
+#notes.open{display:block}
+#notes textarea{width:100%;height:150px;border:1px solid var(--line);border-radius:8px;padding:10px;font:16px/1.45 var(--body);resize:vertical;background:#fff}
+#notes .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:14px;color:var(--ink-2)}
+.has-note::after{content:"";position:absolute;right:12px;top:6px;width:7px;height:7px;border-radius:50%;background:var(--saffron)}
+
+/* TOC overlay */
+#toc{position:absolute;inset:0;background:rgba(227,232,227,.97);z-index:9;display:none;padding:56px 96px;overflow:auto}
+#toc.open{display:block}
+#toc .groups{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;margin-top:26px}
+#toc h3{font-size:20px;margin-bottom:8px}
+#toc button{display:block;width:100%;text-align:left;border:0;background:none;padding:5px 0;font-size:16.5px;color:var(--ink-2)}
+#toc button:hover,#toc button.cur{color:var(--ink);text-decoration:underline}
+
+/* help */
+#help{position:absolute;left:120px;bottom:64px;background:var(--ink);color:var(--pearl);border-radius:10px;padding:14px 18px;font-size:15px;line-height:1.7;z-index:8;display:none}
+#help.open{display:block}
+kbd{font-family:var(--body);background:rgba(255,255,255,.15);border-radius:4px;padding:1px 6px}
+
+/* ---------- decisions ---------- */
+.q{background:var(--pearl);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.q .qt{font-size:19px;font-weight:600;line-height:1.35;margin-bottom:9px}
+.q .qt .n{color:var(--saffron);font-family:var(--display);margin-right:6px}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opts label{font-size:16px;border:1px solid var(--line);border-radius:999px;padding:4px 11px;cursor:pointer;background:#fff;user-select:none}
+.opts input{position:absolute;opacity:0;pointer-events:none}
+.opts label:has(input:checked){background:var(--ink);color:var(--pearl);border-color:var(--ink)}
+.opts label:has(input:focus-visible){outline:3px solid var(--saffron)}
+.q .other{margin-top:8px;width:100%;border:0;border-bottom:1px dashed var(--line);background:transparent;font:15px/1.4 var(--body);padding:4px 0;color:var(--ink);resize:none;overflow:hidden;display:block}
+@media (min-width:821px){.q .other{max-height:96px;overflow:auto}}
+.q.done{border-color:var(--olive);box-shadow:inset 4px 0 0 var(--olive)}
+.qgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.status-pill{display:inline-block;font-size:15px;border-radius:999px;padding:4px 12px;background:var(--saffron-soft)}
+
+/* misc components */
+.chip{display:inline-block;border:1px solid var(--line);background:var(--pearl);border-radius:999px;padding:4px 12px;font-size:15px;margin:3px 4px 3px 0}
+.flow{display:flex;gap:0;align-items:stretch}
+.flow .step{flex:1;position:relative;padding:14px 14px 14px 18px;background:var(--pearl);border:1px solid var(--line);border-left:0;font-size:16.5px;line-height:1.38}
+.flow .step:first-child{border-left:1px solid var(--line);border-radius:10px 0 0 10px}
+.flow .step:last-child{border-radius:0 10px 10px 0}
+.flow .step b{display:block;font-family:var(--display);font-size:16px;margin-bottom:4px}
+.flow .step .who{font-size:13px;color:var(--ink-2);margin-top:6px}
+.flow .step.hot{background:var(--saffron-soft)}
+.quote{font-size:20px;line-height:1.45;border-left:3px solid var(--saffron);padding:4px 0 4px 16px}
+.quote .ar{display:block;font-size:20px;margin-bottom:4px;color:var(--ink)}
+.quote cite{display:block;font-style:normal;font-size:14px;color:var(--ink-2);margin-top:6px}
+.road{display:flex;gap:10px;align-items:center}
+.road .st{flex:1;border-radius:12px;padding:16px 18px;border:2px solid var(--line);background:var(--pearl)}
+.road .st.now{border-color:var(--saffron);background:var(--saffron-soft)}
+.road .st b{font-family:var(--display);font-size:22px;display:block}
+.road .arrow{font-size:26px;color:var(--ink-2)}
+.light{display:inline-flex;gap:8px;vertical-align:middle}
+.light i{width:26px;height:26px;border-radius:50%;background:#cfd6d2;display:block}
+.light i.y{background:var(--saffron);box-shadow:0 0 0 5px rgba(217,154,30,.25)}
+
+/* dial */
+.dialwrap{display:grid;grid-template-columns:520px 1fr;gap:40px;align-items:center}
+.dial-legend span{display:inline-flex;align-items:center;gap:7px;margin-right:16px;font-size:16px}
+.dial-legend i{width:14px;height:14px;border-radius:3px;display:inline-block}
+.heat{display:grid;grid-template-columns:110px repeat(12,1fr);gap:4px;font-size:14px;align-items:center}
+.heat .h{height:30px;border-radius:5px}
+.heat .m{text-align:center;color:var(--ink-2)}
+
+/* phone mock */
+.phone{width:360px;height:640px;border-radius:44px;border:10px solid var(--ink);background:var(--pearl);overflow:hidden;position:relative;box-shadow:0 20px 50px rgba(15,59,58,.25)}
+.phone .scr{padding:22px 18px;font-size:14px;line-height:1.35}
+.phone .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-top:10px}
+.phone .card b{font-size:15px}
+.phone .pill{font-size:11.5px;border-radius:999px;padding:2px 8px;display:inline-block}
+.phone .act{display:inline-block;margin-top:7px;margin-right:6px;font-size:12.5px;border-radius:999px;padding:4px 10px;background:var(--ink);color:#fff}
+.phone .act.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
+
+/* entity map */
+.ent{border:1.5px solid var(--ink);border-radius:10px;padding:8px 12px;background:var(--pearl);font-size:16px}
+td.ar{white-space:nowrap}
+.ent b{font-family:var(--display);font-size:16px;display:block}
+
+/* ---------- send sheet, banner, mobile bar ---------- */
+#sheet{position:fixed;inset:0;z-index:50;display:none;background:rgba(15,59,58,.55);align-items:flex-end;justify-content:center}
+#sheet.open{display:flex}
+#sheet .box{background:var(--pearl);color:var(--ink);width:min(560px,100%);max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));font-size:16px;line-height:1.45}
+@media (min-width:821px){#sheet{align-items:center}#sheet .box{border-radius:18px}}
+#sheet h3{font-size:22px}
+#sheet .x{float:right;border:0;background:none;font-size:15px;color:var(--ink-2);padding:4px 0}
+#sheet label.f{display:block;font-size:14px;color:var(--ink-2);margin:14px 0 4px}
+#sheet input[type=text],#sheet textarea{width:100%;font:16px/1.4 var(--body);padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+#sheet textarea{resize:vertical}
+#sheet .stat{display:flex;gap:10px;margin:14px 0 4px}
+#sheet .stat div{flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;font-size:14px;color:var(--ink-2)}
+#sheet .stat b{display:block;font-family:var(--display);font-size:24px;color:var(--ink)}
+#sheet .msg{font-size:14.5px;color:var(--olive);min-height:22px;margin-top:10px;font-weight:600}
+#sheet details{margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
+#sheet summary{cursor:pointer;color:var(--ink-2);font-size:15px}
+.bigbtn{display:block;width:100%;text-align:center;border:0;border-radius:12px;padding:14px;font-size:17px;font-weight:600;margin-top:10px;background:var(--ink);color:#fff;text-decoration:none;cursor:pointer}
+.bigbtn.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.bigbtn.wa{background:#1F7A4D}
+#banner{position:fixed;left:50%;transform:translateX(-50%);top:10px;z-index:40;background:var(--saffron);color:var(--ink);border-radius:16px;padding:8px 10px 8px 16px;font-size:15px;display:none;align-items:center;gap:8px;flex-wrap:wrap;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100% - 20px)}
+#banner.on{display:flex}
+#banner button{border:0;border-radius:999px;padding:6px 12px;background:var(--ink);color:#fff;font-size:14px}
+#banner button.alt{background:#fff;color:var(--ink)}
+#mbar,.mcomment{display:none}
+.mcomment .mc-btn{border:1px dashed var(--ink-2);background:transparent;border-radius:10px;padding:10px 14px;font-size:15px;color:var(--ink-2);width:100%;text-align:left}
+.mcomment.has .mc-btn{border-style:solid;border-color:var(--saffron);color:var(--ink)}
+.mcomment textarea{margin-top:8px;width:100%;min-height:90px;font:16px/1.45 var(--body);padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+
+/* ---------- phone layout: one long scrolling page ---------- */
+@media (max-width:820px){
+  html,body{background:var(--salt);height:auto}
+  body{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  #viewport{position:static;display:block;place-items:normal}
+  #stage{justify-self:stretch;max-width:100%;width:auto!important;height:auto!important;transform:none!important;border-radius:0;box-shadow:none;overflow:visible}
+  .slide{position:relative;opacity:1;visibility:visible;pointer-events:auto;padding:30px 18px 26px;border-bottom:6px solid var(--ink);scroll-margin-top:0}
+  #rail,#foot,#notes,#help{display:none!important}
+  h1{font-size:44px}h2{font-size:27px;line-height:1.15}h3{font-size:19px}
+  .kicker{font-size:14px}.lead{font-size:18px}.small{font-size:14.5px}
+  ul.ticks li{font-size:16px}
+  .panel{padding:16px}.panel p,.panel li{font-size:16px}
+  .cols,.c2,.c3,.c4,.c5,.c-6-4,.c-4-6,.qgrid,.dialwrap{grid-template-columns:1fr!important;gap:14px!important}
+  .slide div[style*="grid-template-columns"]{grid-template-columns:1fr!important;gap:18px!important;height:auto!important}
+  .q[style*="grid-column"]{grid-column:auto!important}
+  .cols>*,.qgrid>*,.slide div[style*="grid-template-columns"]>*{min-width:0}
+  .phone div[style*="grid-template-columns"]{grid-template-columns:48px 1fr 1fr!important;gap:6px!important}
+  .mt{margin-top:18px}.mt2{margin-top:24px}
+  table.grid{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;font-size:14.5px}
+  table.grid td,table.grid th{min-width:120px}
+  .flow{flex-direction:column}
+  .flow .step{border-left:1px solid var(--line)!important;border-top:0;border-radius:0!important}
+  .flow .step:first-child{border-top:1px solid var(--line);border-radius:10px 10px 0 0!important}
+  .flow .step:last-child{border-radius:0 0 10px 10px!important}
+  .road{flex-direction:column;align-items:stretch}.road .arrow{transform:rotate(90deg);text-align:center}
+  #dial{width:100%;height:auto;max-width:420px}
+  .heat{grid-template-columns:70px repeat(12,1fr);font-size:11px}
+  #landscape svg,#model svg{display:none}
+  #landscape div[style*="position:relative"],#model div[style*="position:relative"]{height:auto!important}
+  #landscape div[style*="position:absolute"],#model div[style*="position:absolute"]{position:static!important;width:auto!important;text-align:left!important;margin:8px 0}
+  .phone{width:100%;max-width:340px;height:auto;margin:0 auto}
+  .phone .scr{padding-bottom:26px}
+  .src-btn{position:static;display:inline-block;margin-top:16px}
+  .src{position:static;width:auto;max-height:none;margin-top:10px;box-shadow:none}
+  .tabs{gap:6px}.tabs button{font-size:14px;padding:7px 12px}
+  .q .qt{font-size:16.5px}
+  .opts label{font-size:15px;padding:8px 13px}
+  .q .other{font-size:16px}
+  .mcomment{display:block;margin-top:18px}
+  #mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(248,249,246,.97);border-top:1px solid var(--line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  #mbar button{flex:1;border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 6px;font-size:15px;line-height:1.2}
+  #mbar button.pri{flex:1.3;background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600}
+  #mbar small{display:block;font-size:11.5px;opacity:.75;font-weight:400}
+  #toc{position:fixed;padding:24px 20px 110px}#toc .groups{grid-template-columns:1fr 1fr;gap:16px}#toc h2{font-size:26px}
+}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+<nav id="rail" aria-label="Sections"></nav>
+
+<!-- ============ INTRO ============ -->
+<section class="slide" id="title" data-section="Start" data-title="Mosbah — discovery deck">
+  <div style="display:grid;grid-template-columns:1fr 420px;gap:60px;height:100%;align-items:center">
+    <div>
+      <p class="kicker">Discovery deck v0.1 · 4 November 2026 · for Loujane &amp; Subhi</p>
+      <h1>Mosbah<br><span style="font-weight:400;font-size:56px">A property platform, starting with Loujane's own</span></h1>
+      <p class="lead mt">This deck brings together what we found about Loujane's idea, how rentals actually work in the region, and what other products already do. It ends with the questions only the two of you can answer.</p>
+      <p class="small mt">Working name: <span class="ar" style="font-size:22px">مصباح</span> (mosbah, "lamp"). It's the repo name, not a brand decision.</p>
+    </div>
+    <div class="panel ink" style="padding:30px">
+      <h3 style="color:var(--saffron)">How to use this deck</h3>
+      <ul class="clean mt-s" style="font-size:18px;line-height:1.8">
+        <li><b>Read</b>: about 20 minutes. Arrows or swipe on a computer; scroll on a phone.</li>
+        <li><b>Answer</b> the questions in the <b>Decide</b> section, and add a comment on any slide.</li>
+        <li><b>Everything saves automatically</b> on this device. You can stop and come back.</li>
+        <li><b>Send answers</b> when you're done (or halfway). It creates a WhatsApp message with all your answers.</li>
+      </ul>
+      <p class="small mt-s" style="color:#B9CDC9">Saved answers stay on this device until you send them. Nothing is uploaded anywhere.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="road" data-section="Start" data-title="Where we are on the road">
+  <p class="kicker">Process</p>
+  <h2>We're at step one. Nothing gets built until you say so.</h2>
+  <div class="road mt2">
+    <div class="st now"><b>1 · Discover</b><span class="small">Research, domain, competitors, open questions. <b>This deck.</b></span></div><span class="arrow">›</span>
+    <div class="st"><b>2 · Outline</b><span class="small">You give ideas over time; we shape them into a product outline and one clear focus.</span></div><span class="arrow">›</span>
+    <div class="st"><b>3 · PRD</b><span class="small">Requirements with IDs, acceptance criteria, non-goals. Only when you call it.</span></div><span class="arrow">›</span>
+    <div class="st"><b>4 · Build</b><span class="small">Spec → design → tasks → code. Only when you call it.</span></div>
+  </div>
+  <div class="cols c3 mt2">
+    <div class="panel"><h3>Honesty labels</h3><p>Each claim carries a tag:<br><span class="tag t-data">Data</span> sourced <span class="tag t-est">Estimate</span> calculated<br><span class="tag t-asm">Assumption</span> untested <span class="tag t-op">Opinion</span> our judgement</p></div>
+    <div class="panel"><h3>How this was made</h3><p>Six research agents worked in parallel: competitors, the Jordan farm model, regulation and payments, owner workflows and AI, a skeptical strategist, and customer voice. I then combined and cross-checked their findings.</p></div>
+    <div class="panel saffron"><h3>Gate before the PRD</h3><p>Before a PRD, real owners must confirm the problem: at least 5 conversations, with 4 or more confirming it unprompted. Research alone is not proof.</p></div>
+  </div>
+</section>
+
+<section class="slide" id="idea" data-section="Start" data-title="Loujane's idea, as written">
+  <p class="kicker">The starting point</p>
+  <h2>Loujane's idea: one place to run a property portfolio, with an assistant that takes action</h2>
+  <div class="cols c-6-4 mt">
+    <div>
+      <p class="quote">"A combination of a property manager, accountant, maintenance coordinator and tenant-service application… many landlords still manage through WhatsApp, Excel sheets, phone calls and separate service providers."<cite>Loujane's notes</cite></p>
+      <div class="cols c2 mt">
+        <div><h3>The basic layer</h3><ul class="ticks"><li>Occupancy across properties</li><li>Who paid, what's outstanding</li><li>Renewals coming up</li><li>Maintenance requests</li><li>Income, expenses, profit</li></ul></div>
+        <div><h3>The "smart" layer</h3><ul class="ticks"><li>Book and compare maintenance quotes</li><li>Find tenants, market vacancies</li><li>Track values and rent trends</li><li>AI advice: renovate, sell, raise rent</li><li>Many cities and countries</li></ul></div>
+      </div>
+    </div>
+    <div class="panel olive">
+      <h3>Her sharpest line</h3>
+      <p style="font-size:22px;line-height:1.4">"The key would be identifying a customer segment whose needs existing platforms don't adequately serve, rather than competing feature-for-feature."</p>
+      <p class="small mt">We agree. The rest of this deck tests every other line in her notes against that one.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="steelman" data-section="Start" data-title="What's strong, what's risky">
+  <p class="kicker">Honest first read</p>
+  <h2>The problem is real. But as written, the notes describe five companies.</h2>
+  <div class="cols c2 mt">
+    <div class="panel olive">
+      <h3>Strong</h3>
+      <ul class="ticks">
+        <li><b>The pain is real.</b> WhatsApp, Excel and a relative on the ground is how it works today. Late rent goes unchased, renewals get missed, nothing is written down. <span class="tag t-data">Data</span></li>
+        <li><b>The founder is the user.</b> Loujane has long-term flats, furnished flats and a shift-rented farm across 2 countries and 2 currencies. <span class="tag t-data">Data</span></li>
+        <li><b>The owner's point of view is underserved.</b> Regional tools serve brokers, property managers or government processes. <span class="tag t-op">Opinion</span></li>
+        <li><b>Owning across borders is a real gap.</b> We found no tool combining Jordan, Bahrain, Ejar and multiple currencies. <span class="tag t-data">Data</span></li>
+      </ul>
+    </div>
+    <div class="panel pom">
+      <h3>Risky</h3>
+      <ul class="ticks">
+        <li><b>Five products in one:</b> property management, accounting, a vendor marketplace, a listings portal and an investment advisor. Some rivals are well funded (Gathern ≈ $266M valuation). <span class="tag t-data">Data</span></li>
+        <li><b>"AI says sell" has no data to run on.</b> Bahrain has no official price index, and Jordan's public index dates from 2018. <span class="tag t-data">Data</span></li>
+        <li><b>Vendor marketplace = cold start ×4 cities.</b> Munjz tried a consumer handyman app and pivoted to B2B. <span class="tag t-data">Data</span></li>
+        <li><b>Four countries at once</b>, each with different laws, payment systems, currencies and dialects. <span class="tag t-op">Opinion</span></li>
+        <li><b>The Jeddah investor persona is invented.</b> Loujane's real portfolio is a better guide. <span class="tag t-op">Opinion</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="src"><b>Sources</b><ul>
+    <li>Gathern Series B: <a href="https://www.phocuswire.com/saudi-arabian-vacation-rental-platform-gathern-lands-72-million-dollars" target="_blank">PhocusWire</a>, <a href="https://www.wamda.com/index.php/en/2025/08/gathern-raises-72-million-series-b-ahead-tadawul-ipo" target="_blank">Wamda</a></li>
+    <li>Munjz pivot: <a href="https://yespress.io/munjz-fm-pm-technology" target="_blank">yespress</a></li>
+    <li>Jordan price index (2018): <a href="https://opendata.gov.jo/en/dataset/metadata/jordan-real-estate-price-index-by-governorates-415-2018" target="_blank">opendata.gov.jo</a>; Bahrain no official index: <a href="https://www.globalpropertyguide.com/middle-east/bahrain/price-change-1-year" target="_blank">Global Property Guide</a></li>
+  </ul><p><b>Confidence:</b> high on the facts, medium on "five companies" (that's a judgement).</p></div>
+</section>
+
+<!-- ============ DOMAIN ============ -->
+<section class="slide" id="three-businesses" data-section="Domain" data-title="Three businesses in one portfolio">
+  <p class="kicker">Understanding Loujane's portfolio</p>
+  <h2>Loujane runs three different rental businesses, not one</h2>
+  <table class="grid mt">
+    <tr><th style="width:220px"></th><th>Unfurnished flat</th><th>Furnished flat (incl. 1–6 month stays)</th><th>Farm <span class="ar">مزرعة</span> by shift</th></tr>
+    <tr><td>Unit of sale</td><td>A year (lease)</td><td>A month to a year</td><td>A <b>shift</b>: day, night or 24h</td></tr>
+    <tr><td>Rhythm</td><td>12 rent events/yr + 1 renewal</td><td>Monthly + turnover between tenants</td><td>Weekly in season: Thu/Fri/Sat, Eid, summer</td></tr>
+    <tr><td>Money</td><td>Monthly transfer (BH/JO) or 1–4 cheques (KSA/UAE)</td><td>Monthly upfront, 20–40% premium <span class="tag t-est">Estimate</span></td><td><span class="ar">عربون</span> booking deposit + <span class="ar">تأمين</span> damage deposit + balance</td></tr>
+    <tr><td>Main risk</td><td>Late rent, vacancy, missed renewal</td><td>Damage to contents, utility overuse</td><td>Double-booking, no-shows, damage, pool safety</td></tr>
+    <tr><td>Paperwork</td><td>Registered lease, utilities in tenant name</td><td>Inventory with photos, move-in/out check</td><td>Rules, ID, waiver; licensing unclear in Jordan</td></tr>
+    <tr><td>Who's on the ground</td><td>Relative or building <span class="ar">حارس</span></td><td>Relative + cleaner</td><td>Caretaker <span class="ar">ناطور</span> + cleaning crew</td></tr>
+    <tr><td>Software today</td><td>Ejar/Ejari in KSA/UAE; Excel elsewhere</td><td>Same</td><td>WhatsApp, notebook, OpenSooq, a few small apps</td></tr>
+  </table>
+  <p class="lead mt" style="font-size:21px">Long-term tools ignore shifts, and short-stay tools ignore leases. <b>No product we found handles both in one ledger.</b> <span class="tag t-data">Data</span></p>
+  <div class="src"><b>Sources</b><ul><li>Competitor scan (Buildium, TurboTenant, Hostaway, Guesty, Smoobu, AmLaki, BaiTech, etc.): see Market section</li><li>Furnished premium: practitioner estimate; to verify with Loujane's own rents</li></ul></div>
+</section>
+
+<section class="slide" id="farm-model" data-section="Domain" data-title="The Jordan farm model: selling time">
+  <p class="kicker">The Jordanian farm, explained</p>
+  <h2>A farm sells blocks of time, not nights</h2>
+  <div class="dialwrap mt">
+    <svg id="dial" viewBox="0 0 520 520" width="520" height="520" role="img" aria-label="24 hour shift dial"></svg>
+    <div>
+      <div class="tabs" role="tablist">
+        <button data-preset="classic">Amman listing</button>
+        <button data-preset="jerash">Jerash listing</button>
+        <button data-preset="full">Full 24h</button>
+        <button data-preset="bahrain">Bahrain chalet</button>
+      </div>
+      <ul class="clean dial-legend" id="dialList" style="font-size:18px;line-height:2"></ul>
+      <div class="panel mt-s" style="padding:16px 20px">
+        <ul class="ticks" style="font-size:17px">
+          <li>The guest group gets <b>exclusive use</b> of the farm: pool, BBQ, garden, Arabic seating hall <span class="ar">ديوان</span>. <span class="tag t-data">Data</span></li>
+          <li>Two shifts a day, plus a cheaper 24h bundle. <b>The night shift crosses midnight.</b> <span class="tag t-data">Data</span></li>
+          <li><b>Cleaning time between shifts is only 0–2 hours</b>, so the caretaker's turnover is the real job. <span class="tag t-data">Data</span></li>
+          <li>Booking a 24h slot <b>blocks both shifts</b>. Times differ for each farm, sometimes for each weekday. <span class="tag t-data">Data</span></li>
+        </ul>
+      </div>
+      <p class="small mt-s">Market: ~5,000 farms in Jordan, ~2,500 rented out; most owners have 1–3. Summer 2026 rents fell ~25% to 100–120 JOD. <span class="tag t-data">Data</span></p>
+    </div>
+  </div>
+  <div class="src"><b>Sources</b><ul>
+    <li>Shift times and prices: OpenSooq listings <a href="https://jo.opensooq.com/ar/search/283061732" target="_blank">Amman</a>, <a href="https://jo.opensooq.com/en/search/278075987" target="_blank">Jerash Hills</a>, <a href="https://jo.opensooq.com/en/search/282233494" target="_blank">Irbid</a>, <a href="https://jo.opensooq.com/ar/search/279903383" target="_blank">24h bundle</a></li>
+    <li>Market size and 2026 prices: <a href="https://alghad.com/Section-181/%D8%A7%D9%82%D8%AA%D8%B5%D8%A7%D8%AF/%D8%A7%D9%84%D9%85%D8%B2%D8%A7%D8%B1%D8%B9-%D8%A7%D9%84%D8%B3%D9%8A%D8%A7%D8%AD%D9%8A%D8%A9-%D9%88%D8%A7%D9%84%D8%B5%D9%8A%D9%81-%D9%85%D8%B7%D8%A7%D9%84%D8%A8-%D8%A8%D8%AA%D9%86%D8%B8%D9%8A%D9%85-%D8%A7%D9%84%D9%82%D8%B7%D8%A7%D8%B9-%D8%AA%D8%AD%D8%AA-%D9%85%D8%B8%D9%84%D8%A9-%D8%AD%D9%83%D9%88%D9%85%D9%8A%D8%A9-2090630" target="_blank">Al-Ghad, Aug 2026</a> (head of the farm-tourism union)</li>
+    <li>Bahrain chalet 8h periods: <a href="https://www.ootlah.com/en/attractions-bh-oth5497-8-hours-at-smart-pool-chalet-in-bahrain.html" target="_blank">Ootlah</a></li>
+  </ul><p><b>Confidence:</b> medium-high. The prices are owners' asking prices, read via search snippets (OpenSooq blocks direct access).</p></div>
+</section>
+
+<section class="slide" id="farm-pricing" data-section="Domain" data-title="Farm pricing & seasons">
+  <p class="kicker">How farms set prices</p>
+  <h2>Price = shift × weekday × season × headcount</h2>
+  <div class="cols c-6-4 mt">
+    <div>
+      <table class="grid">
+        <tr><th>Product (illustrative, JOD)</th><th>Sun–Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Summer</th><th>Eid</th></tr>
+        <tr><td>Day 10:00–20:00</td><td>80</td><td>90</td><td>110</td><td>100</td><td>+15–20%</td><td>+40–60%</td></tr>
+        <tr><td>Night 22:00–09:00</td><td>70</td><td>100</td><td>100</td><td>85</td><td>+15–20%</td><td>+40–60%</td></tr>
+        <tr><td>24h</td><td>130</td><td>160</td><td>180</td><td>160</td><td>+15%</td><td>quote</td></tr>
+        <tr><td>Extra guest (&gt;15)</td><td>3</td><td>3</td><td>3</td><td>3</td><td>3</td><td>5</td></tr>
+        <tr><td><span class="ar">عربون</span> booking deposit</td><td colspan="6">30–50% or 20–50 JOD flat, via CliQ; usually kept on late cancellation</td></tr>
+        <tr><td><span class="ar">تأمين</span> damage deposit</td><td colspan="6">50–100 JOD cash at check-in, returned "if handed back as received"</td></tr>
+      </table>
+      <p class="small mt-s">This rate card is <b>synthesised from real listings, not real rates</b> <span class="tag t-est">Estimate</span>. The Eid uplift is an assumption <span class="tag t-asm">Assumption</span>.</p>
+    </div>
+    <div>
+      <h3>Two opposite peaks</h3>
+      <div class="heat mt-s" id="heat">
+        <span></span><span class="m">J</span><span class="m">F</span><span class="m">M</span><span class="m">A</span><span class="m">M</span><span class="m">J</span><span class="m">J</span><span class="m">A</span><span class="m">S</span><span class="m">O</span><span class="m">N</span><span class="m">D</span>
+        <span>Mountain<br><span class="small">Jerash, Ajloun, Amman</span></span>
+        <i class="h" style="background:#E4E9CF"></i><i class="h" style="background:#E4E9CF"></i><i class="h" style="background:#C9D2A3"></i><i class="h" style="background:#A9B86A"></i><i class="h" style="background:#8C9C45"></i><i class="h" style="background:#6E7F2A"></i><i class="h" style="background:#4F5E17"></i><i class="h" style="background:#4F5E17"></i><i class="h" style="background:#8C9C45"></i><i class="h" style="background:#A9B86A"></i><i class="h" style="background:#C9D2A3"></i><i class="h" style="background:#E4E9CF"></i>
+        <span>Dead Sea<br><span class="small">Ghor, −400 m</span></span>
+        <i class="h" style="background:#1F5470"></i><i class="h" style="background:#1F5470"></i><i class="h" style="background:#2D6E8E"></i><i class="h" style="background:#6E9DB5"></i><i class="h" style="background:#B5CFDD"></i><i class="h" style="background:#D7E6EE"></i><i class="h" style="background:#D7E6EE"></i><i class="h" style="background:#D7E6EE"></i><i class="h" style="background:#B5CFDD"></i><i class="h" style="background:#6E9DB5"></i><i class="h" style="background:#2D6E8E"></i><i class="h" style="background:#1F5470"></i>
+      </div>
+      <p class="small mt-s">Darker means busier (qualitative). Eid moves about 11 days earlier each year, so pricing has to follow the Hijri calendar.</p>
+      <div class="panel saffron mt-s"><b>So the product needs a rate engine,</b> not a "nightly price" field. That's exactly what Airbnb-style tools lack.</div>
+    </div>
+  </div>
+  <div class="src"><b>Sources</b><ul>
+    <li>Weekday pricing: Jerash VIP 250/280/300; Rawda 150/170; Swaimeh overnight add-on (<a href="https://jo.opensooq.com/ar/search/282165934" target="_blank">OpenSooq Dead Sea</a>)</li>
+    <li>Headcount surcharge: <a href="https://jo.opensooq.com/en/search/278075987" target="_blank">Jerash Hills</a></li>
+    <li>Damage deposit amounts and wording: <a href="https://jo.opensooq.com/ar/search/282032156" target="_blank">Salt/Jalaad</a>, <a href="https://jo.opensooq.com/ar/search/283337376" target="_blank">search</a></li>
+    <li>Heated pools for winter: <a href="https://jo.opensooq.com/ar/search/282293930" target="_blank">broker listing</a></li>
+  </ul><p><b>Confidence:</b> medium. The seasonality pattern is well supported; the exact uplifts are not.</p></div>
+</section>
+
+<section class="slide" id="farm-flow" data-section="Domain" data-title="A farm booking, end to end">
+  <p class="kicker">One farm booking, step by step</p>
+  <h2>The steps with orange headers are where money or trust gets lost today</h2>
+  <div class="flow mt2">
+    <div class="step"><b>Inquiry</b>Instagram, OpenSooq or a broker, then WhatsApp. "How much for Friday?"<div class="who">Guest → owner</div></div>
+    <div class="step hot"><b>Availability</b>Owner checks a notebook and WhatsApp history. Double-booking happens here.<div class="who">Owner, broker</div></div>
+    <div class="step"><b>Quote</b>Shift × day × headcount × extras.<div class="who">Owner</div></div>
+    <div class="step hot"><b>Booking deposit</b>Via CliQ. Unpaid holds pile up; no-shows.<div class="who">Guest</div></div>
+    <div class="step"><b>Rules &amp; ID</b>Families or mixed, headcount, pool waiver, ID photo.<div class="who">Guest</div></div>
+    <div class="step"><b>Check-in</b>Collect the balance and damage deposit; hand over keys.<div class="who">Caretaker</div></div>
+    <div class="step hot"><b>Checkout check</b>A verbal walkthrough. Damage disputes start here.<div class="who">Caretaker</div></div>
+    <div class="step hot"><b>Settle</b>Refund or deduct the deposit; pay cleaner and caretaker; log gas, water, chlorine.<div class="who">Owner</div></div>
+  </div>
+  <div class="cols c3 mt2">
+    <div class="panel"><h3>Guest's fear</h3><p>Fake listings that take a deposit and vanish, hidden cameras, "price on WhatsApp only", photos that don't match. <span class="tag t-data">Data</span></p></div>
+    <div class="panel"><h3>Owner's fear</h3><p>"Family" bookings that turn into parties, double-bookings across channels, drownings and the legal fallout. <span class="tag t-data">Data</span></p></div>
+    <div class="panel olive"><h3>The opportunity</h3><p>A booking link with live free shifts and a real price, a CliQ deposit request, digital rules, and a photo checklist for the caretaker. <span class="tag t-op">Opinion</span></p></div>
+  </div>
+  <div class="src"><b>Sources</b><ul>
+    <li>Fake farm listings: <a href="https://royanews.tv/news/389842" target="_blank">Roya News</a> (headline only); OpenSooq warns renters not to pay in advance</li>
+    <li>Pool-safety crackdown and detentions: <a href="https://alwakaai.com/article/440248" target="_blank">Al-Wakaai 2022</a></li>
+    <li>CliQ request-to-pay and return payments: <a href="https://jopacc.com/node/279" target="_blank">JoPACC</a></li>
+  </ul></div>
+</section>
+
+<section class="slide" id="lt-flow" data-section="Domain" data-title="A long-term lease, end to end">
+  <p class="kicker">The long-term flat, step by step</p>
+  <h2>A lease is a year-long loop, and most of it happens over WhatsApp</h2>
+  <div class="flow mt">
+    <div class="step"><b>Lead</b>Portal, WhatsApp, referral</div>
+    <div class="step"><b>Viewing</b>Relative shows the flat</div>
+    <div class="step"><b>Screening</b>ID, CPR or Iqama, employer letter</div>
+    <div class="step"><b>Contract</b>Template + register (Ejar, Ejari, Bahrain RERA)</div>
+    <div class="step"><b>Move-in check</b>Photos + inventory</div>
+  </div>
+  <div class="flow" style="margin-top:8px">
+    <div class="step"><b>Rent schedule</b>Monthly or cheque dates</div>
+    <div class="step hot"><b>Reminders</b>Awkward to chase in person, or through family</div>
+    <div class="step hot"><b>Reconcile</b>"Did that transfer land?"</div>
+    <div class="step"><b>Maintenance</b>Voice note → vendor → quote → approve</div>
+    <div class="step"><b>Expense</b>Receipt photo</div>
+  </div>
+  <div class="flow" style="margin-top:8px">
+    <div class="step hot"><b>Renewal</b>60–90 days out; local rules on increases</div>
+    <div class="step"><b>Move-out check</b>Compare with move-in photos</div>
+    <div class="step hot"><b>Deposit settlement</b>Tenants' #1 dispute</div>
+    <div class="step"><b>Re-let</b>Summer crunch: expats leave suddenly</div>
+  </div>
+  <div class="cols c3 mt">
+    <div class="panel sea"><h3>Bahrain detail</h3><p>The tenant can only get electricity and water (EWA) with a registered lease. "Utilities included up to X BHD" clauses are common, so the owner carries the summer AC risk. <span class="tag t-data">Data</span></p></div>
+    <div class="panel sea"><h3>Jordan detail</h3><p>Mostly informal. Bills often stay in the owner's name and the tenant pays them back; rent goes by CliQ or as cash to a relative. <span class="tag t-asm">Assumption</span></p></div>
+    <div class="panel sea"><h3>KSA / UAE detail</h3><p>Ejar and Ejari are mandatory. KSA residential rent must go through Ejar's channels, and Riyadh has a 5-year rent freeze from Sep 2025. <span class="tag t-data">Data</span></p></div>
+  </div>
+  <div class="src"><b>Sources</b><ul>
+    <li>Bahrain EWA/lease link: <a href="https://chambers.com/articles/bahrains-lease-law" target="_blank">Chambers</a>; Law 27/2014: <a href="https://www.slrb.gov.bh/en/law-no-27-of-2014-with-respect-to-promulgating-the-property-rent-law" target="_blank">SLRB</a></li>
+    <li>KSA Ejar digital payments: <a href="https://rega.gov.sa/en/media-center/news/restricting-rent-payment-for-residential-contracts-through-digital-channels-starting-15-january" target="_blank">REGA</a>; Riyadh freeze: <a href="https://www.agbi.com/real-estate/2025/09/saudi-authority-announces-five-year-riyadh-rent-freeze/" target="_blank">AGBI</a></li>
+  </ul><p>Jordan practice needs confirming with Loujane.</p></div>
+</section>
+
+<section class="slide" id="furnished" data-section="Domain" data-title="Furnished vs unfurnished">
+  <p class="kicker">Furnished vs unfurnished</p>
+  <h2>A furnished flat needs a record of everything inside it</h2>
+  <div class="cols c2 mt">
+    <table class="grid">
+      <tr><th></th><th>Unfurnished</th><th>Furnished</th></tr>
+      <tr><td>Tenant</td><td>Families, long-stay expats</td><td>Single expats, project staff, medical and student stays</td></tr>
+      <tr><td>Term</td><td>Annual</td><td>1–12 months</td></tr>
+      <tr><td>Deposit</td><td>~1 month</td><td>1–2 months, plus a damage clause</td></tr>
+      <tr><td>Inventory</td><td>Fixtures (ACs, kitchen)</td><td>Itemised: photo, condition, cost</td></tr>
+      <tr><td>Inspections</td><td>In and out</td><td>In, mid-term spot check, out (line by line)</td></tr>
+      <tr><td>Utilities</td><td>Tenant's name</td><td>Often included up to a cap</td></tr>
+      <tr><td>Turnover</td><td>Rare, long vacancy</td><td>Frequent: cleaning, restocking, new photos</td></tr>
+    </table>
+    <div>
+      <div class="panel"><h3>What the product needs</h3>
+        <ul class="ticks">
+          <li><b>Inventory items</b> attached to a unit (or the farm), each with photo, condition and replacement cost</li>
+          <li><b>Inspection templates</b> that compare move-in and move-out item by item, and turn damage into a charge</li>
+          <li>A <b>utility cap</b> on the lease: "included up to 25 BHD, excess billed"</li>
+          <li><b>Mid-term stays</b> handled as normal leases with a short end date, not as a third product</li>
+        </ul>
+      </div>
+      <p class="small mt-s">The same inspection and inventory tools serve the farm's checkout check. Build once, use for all three businesses. <span class="tag t-op">Opinion</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="people" data-section="Domain" data-title="The four people the product serves">
+  <p class="kicker">Who it serves (empathy exercise)</p>
+  <h2>Four people, and each one's "aha" moment</h2>
+  <div data-tabs class="mt-s">
+    <div class="tabs">
+      <button>Owner (Loujane)</button><button>Caretaker <span class="ar">ناطور</span></button><button>Farm guest</button><button>Long-term tenant</button>
+    </div>
+    <div class="tabpanel">
+      <div class="cols c3">
+        <div class="panel"><h3>Who &amp; mental state</h3><p>Owns in two countries, possibly lives in a third. A constant low worry: "Did Ahmad pay? Is Friday's farm booking confirmed? What did my cousin spend on the AC?" She scrolls WhatsApp to answer each question.</p></div>
+        <div class="panel"><h3>Cares about / doesn't care about</h3><p><b>Cares:</b> certainty, not having to chase people (especially family), a fair deposit, trust in the people on the ground, real profit.<br><b>Doesn't care:</b> charts, accounting categories, AI valuations, "ecosystems".</p></div>
+        <div class="panel saffron"><h3>Aha moment</h3><p>She forwards a CliQ screenshot or a voice note, and it lands in the right place. Then one screen shows: <i>"November: 4 of 5 rents in · farm 9 shifts booked · 1 deposit pending · 63 JOD to approve."</i></p><p class="small mt-s"><b>80/20:</b> capture by forwarding things, plus one "this month" screen.</p></div>
+      </div>
+    </div>
+    <div class="tabpanel">
+      <div class="cols c3">
+        <div class="panel"><h3>Who &amp; mental state</h3><p>Lives on site or nearby, is paid per shift or monthly, and uses a low-end Android phone. Fluent in voice notes, not in forms. Worried about being blamed and about being watched.</p></div>
+        <div class="panel"><h3>Cares about / doesn't care about</h3><p><b>Cares:</b> clear instructions, being paid back quickly from petty cash, proof that "it was broken before".<br><b>Doesn't care:</b> accounts, passwords, installing any app.</p></div>
+        <div class="panel saffron"><h3>Aha moment</h3><p>He sends a voice note, "The pool pump stopped," with a photo, and gets the owner's approval and a vendor booked within minutes, on WhatsApp.</p><p class="small mt-s"><b>80/20:</b> WhatsApp-only checklists and receipts. No app.</p></div>
+      </div>
+    </div>
+    <div class="tabpanel">
+      <div class="cols c3">
+        <div class="panel"><h3>Who &amp; mental state</h3><p>A family or group planning Friday, Eid or a birthday. Suspicious because fake listings take deposits. Annoyed by "price on WhatsApp".</p></div>
+        <div class="panel"><h3>Cares about / doesn't care about</h3><p><b>Cares:</b> real photos, a clear price, free shifts, getting the damage deposit back, privacy.<br><b>Doesn't care:</b> creating an account or downloading an app.</p></div>
+        <div class="panel saffron"><h3>Aha moment</h3><p>The owner sends one link. It shows Friday's night shift is free at 100 JOD; the guest pays the deposit by CliQ and instantly gets confirmation, house rules and the location pin.</p><p class="small mt-s"><b>80/20:</b> a booking page with availability and a deposit request.</p></div>
+      </div>
+    </div>
+    <div class="tabpanel">
+      <div class="cols c3">
+        <div class="panel"><h3>Who &amp; mental state</h3><p>Often an expat in Bahrain; a local family in Jordan. Wants to be a good tenant, without friction.</p></div>
+        <div class="panel"><h3>Cares about / doesn't care about</h3><p><b>Cares:</b> a receipt as proof (for visa or bank), fast repairs, a fair deposit return, written notice of any increase.<br><b>Doesn't care:</b> the owner's dashboards.</p></div>
+        <div class="panel saffron"><h3>Aha moment</h3><p>Pays, and a receipt arrives on WhatsApp in seconds. Reports a leak by voice note and gets an appointment time the same day.</p><p class="small mt-s"><b>80/20:</b> reminders, receipts and repair requests, all on WhatsApp.</p></div>
+      </div>
+    </div>
+  </div>
+  <p class="small mt-s">Pattern: <b>three of the four people should never need to install anything.</b> WhatsApp plus web links is how the product reaches them. <span class="tag t-op">Opinion</span></p>
+</section>
+
+<!-- ============ MARKET ============ -->
+<section class="slide" id="landscape" data-section="Market" data-title="The competitive map">
+  <p class="kicker">Who else is here</p>
+  <h2>Plenty of competitors. But they serve the owner of one rental type in one country.</h2>
+  <div style="position:relative;height:620px;margin-top:22px">
+    <svg viewBox="0 0 1380 620" width="1380" height="620" style="position:absolute;inset:0">
+      <line x1="690" y1="20" x2="690" y2="600" stroke="#9FB0A8" stroke-dasharray="4 6"/>
+      <line x1="20" y1="310" x2="1360" y2="310" stroke="#9FB0A8" stroke-dasharray="4 6"/>
+      <text x="22" y="304" font-size="15" fill="#3E5F5C">◂ Long-term leases</text>
+      <text x="1358" y="304" font-size="15" fill="#3E5F5C" text-anchor="end">Short stays / shifts ▸</text>
+      <text x="698" y="38" font-size="15" fill="#3E5F5C">▴ Owner's operating tool</text>
+      <text x="698" y="596" font-size="15" fill="#3E5F5C">▾ Marketplace / demand / money</text>
+      <rect x="560" y="236" width="260" height="148" rx="74" fill="#F6E7C4" stroke="#D99A1E" stroke-width="2" stroke-dasharray="6 5"/>
+      <text x="690" y="300" text-anchor="middle" font-family="Alexandria" font-weight="800" font-size="21" fill="#0F3B3A">Empty middle</text>
+      <text x="690" y="326" text-anchor="middle" font-size="15" fill="#3E5F5C">mixed portfolio, multi-country,</text>
+      <text x="690" y="346" text-anchor="middle" font-size="15" fill="#3E5F5C">owner + caretaker, Arabic-first</text>
+    </svg>
+    <!-- chips positioned -->
+    <div style="position:absolute;left:40px;top:60px;width:560px">
+      <span class="chip">Buildium</span><span class="chip">TurboTenant</span><span class="chip">RentRedi</span><span class="chip">Avail</span><span class="chip">Stessa / Baselane</span><span class="chip">Landlord Studio</span><span class="chip">DoorLoop (left small owners)</span>
+      <div class="mt-s"></div>
+      <span class="chip" style="border-color:var(--olive)">AmLaki (KSA)</span><span class="chip" style="border-color:var(--olive)">Mulki (KSA)</span><span class="chip" style="border-color:var(--olive)">BaiTech (Bahrain, 1 BHD/unit)</span><span class="chip" style="border-color:var(--olive)">Tecurve (UAE)</span>
+    </div>
+    <div style="position:absolute;right:40px;top:60px;width:520px;text-align:right">
+      <span class="chip">Hostaway</span><span class="chip">Guesty (dropped small hosts 2026)</span><span class="chip">Smoobu</span><span class="chip">Hospitable</span><span class="chip">Lodgify</span><span class="chip">OwnerRez</span>
+      <p class="small mt-s">None of them handle day/night shifts, CliQ, or Gathern/OpenSooq.</p>
+    </div>
+    <div style="position:absolute;left:40px;bottom:50px;width:560px">
+      <span class="chip" style="border-color:var(--sea)">Ejar (gov)</span><span class="chip" style="border-color:var(--sea)">Ejari / Tawtheeq (gov)</span><span class="chip">Aqar</span><span class="chip">Property Finder</span><span class="chip">Bayut</span><span class="chip">OpenSooq</span><span class="chip">Rize · Keyper · Ejari (rent now, pay later)</span>
+    </div>
+    <div style="position:absolute;right:40px;bottom:50px;width:520px;text-align:right">
+      <span class="chip">Gathern (KSA, $266M)</span><span class="chip">Airbnb</span><span class="chip">OpenSooq farms</span><span class="chip">Ajirly · Private Stays · Here2Rest (JO)</span><span class="chip">Dubai holiday-home managers 15–25%</span>
+    </div>
+  </div>
+  <div class="src"><b>Sources</b><ul>
+    <li>Pricing and positioning: <a href="https://www.buildium.com/pricing/" target="_blank">Buildium</a>, <a href="https://www.doorloop.com/pricing" target="_blank">DoorLoop</a>, <a href="https://www.smoobu.com/en/pricing/" target="_blank">Smoobu</a>, <a href="https://zeevou.com/?p=181385" target="_blank">Guesty For Hosts shutdown</a></li>
+    <li>BaiTech: <a href="https://apps.apple.com/us/app/baitech/id6758333027" target="_blank">App Store</a>; AmLaki: <a href="https://dev.to/dhmi88/best-property-management-software-ksa-2026-amlaki-vs-competitors-32mn" target="_blank">dev.to</a>; Tecurve: <a href="https://www.producthunt.com/p/tecurve" target="_blank">Product Hunt</a></li>
+    <li>Gathern: <a href="https://www.wamda.com/index.php/en/2025/08/gathern-raises-72-million-series-b-ahead-tadawul-ipo" target="_blank">Wamda</a> (KSA only; host commission not public)</li>
+    <li>Ajirly: <a href="https://apps.apple.com/app/id6499079101" target="_blank">App Store</a> (4.3★, 233 ratings)</li>
+  </ul><p><b>Confidence:</b> the existence of each player is verified; most prices come from third-party review sites.</p></div>
+</section>
+
+<section class="slide" id="competitors-table" data-section="Market" data-title="Closest competitors, up close">
+  <p class="kicker">The ones that matter most to us</p>
+  <h2>Five competitors to watch closely</h2>
+  <table class="grid mt">
+    <tr><th>Name</th><th>Where</th><th>What it does</th><th>Price</th><th>What it teaches us</th></tr>
+    <tr><td>BaiTech</td><td>Bahrain</td><td>"AI-first" app for landlords: leases, arrears, maintenance tickets, a WhatsApp AI assistant called "Basem", BenefitPay + Tap, Arabic, "elderly-friendly". It even bills tenants for using electricity/water (EWA) over the cap. Long-term rentals only; no short stays or Jordan.</td><td>1 BHD / unit / mo; 1st month free</td><td><b>The closest direct rival in Loujane's market.</b> Arabic + WhatsApp alone is not a differentiator.</td></tr>
+    <tr><td>AmLaki / Mulki</td><td>KSA</td><td>Small-landlord apps: Hijri calendar, ZATCA invoices, importing the Ejar payment schedule</td><td>Free ≤20 units, SAR 99–199/mo</td><td>Import from government systems; don't replace them</td></tr>
+    <tr><td>Gathern</td><td>KSA only</td><td>Short-stay marketplace (chalets, istirahas, farms); ~44% claimed share</td><td>Commission (not public)</td><td>Owns guest demand in KSA. We complement it rather than compete.</td></tr>
+    <tr><td>Ajirly <span class="ar">اجرلي</span></td><td>Jordan (likely)</td><td>Daily farm and chalet rentals with a live availability calendar; "direct with owner"</td><td>?</td><td>Guest-side marketplace. The owner's daily operations are still not solved.</td></tr>
+    <tr><td>Stessa / Baselane</td><td>US</td><td>Free portfolio dashboard plus bookkeeping; makes money through banking</td><td>Free–$20/mo</td><td>The closest model to "dashboard + profitability". Money comes from payments.</td></tr>
+    <tr><td>Smoobu / Hospitable</td><td>Global</td><td>Small-host short-stay tools with AI messaging</td><td>€28–40/mo</td><td>Small hosts can be served cheaply. Shifts and deposits are missing.</td></tr>
+  </table>
+  <div class="src"><b>Sources</b><ul>
+    <li><a href="https://apps.apple.com/us/app/baitech/id6758333027" target="_blank">BaiTech App Store</a>: no ratings; last update 1.0.5 on 6 Apr 2026; built by an agency (Ignite Software and Design). Pricing and "Basem" come from its <a href="https://github.com/AmmarSiddiqu1/Baitech-Website" target="_blank">public website repo</a> (FAQ). The site's app screenshots are stock fintech images, and its "500 / 98% / 100" metrics are unverified.</li>
+    <li><a href="https://amlacki.themindstudios.com/" target="_blank">Mulki</a>, <a href="https://dev.to/dhmi88/best-property-management-software-ksa-2026-amlaki-vs-competitors-32mn" target="_blank">AmLaki</a></li>
+    <li><a href="https://www.pickstack.pages.dev/comparisons/stessa-vs-baselane" target="_blank">Stessa vs Baselane</a></li>
+  </ul><p>The next step is to test BaiTech hands-on (install it and try it with one of Loujane's Bahrain flats).</p></div>
+</section>
+
+<section class="slide" id="lessons" data-section="Market" data-title="Ten lessons from competitors">
+  <p class="kicker">What the market teaches us</p>
+  <h2>Ten lessons, applied to us</h2>
+  <div class="cols c2 mt" style="gap:16px 40px">
+    <ul class="ticks">
+      <li><b>Work alongside the government systems</b> (Ejar, Ejari, Bahrain registry) instead of replacing them. Store the registration numbers and import their data.</li>
+      <li><b>The money is in payments, not subscriptions.</b> Buildium's transfer fees, Stessa's banking, upfront rent from Rize and Keyper.</li>
+      <li><b>Don't charge tenants to fund a free product.</b> TurboTenant and TenantCloud got backlash for it.</li>
+      <li><b>Small owners get abandoned.</b> DoorLoop added $199+ minimums and Guesty shut its small-host product. Promise to stay with 1–30 units.</li>
+      <li><b>Keep pricing predictable:</b> flat tiers, free for 1–3 units.</li>
+    </ul>
+    <ul class="ticks" start="6">
+      <li><b>Rules limit "smart" advice:</b> the Riyadh freeze, Abu Dhabi's 0% cap, Bahrain's 5% every 2 years.</li>
+      <li><b>Arabic, Hijri and WhatsApp are the minimum</b> in 2026, not a differentiator.</li>
+      <li><b>Short stays don't need a channel manager.</b> They need one calendar, deposits and the caretaker's turnover.</li>
+      <li><b>Don't build a listings portal.</b> Feed listings into the existing ones, with the required ad licences.</li>
+      <li><b>Trust is the product:</b> proof of payment, payout reliability, deposit fairness. OpenSooq itself tells guests not to pay in advance.</li>
+    </ul>
+  </div>
+  <div class="panel ink mt"><p style="font-size:21px">Put together, this argues for <b>an owner's operating tool for mixed portfolios across borders</b>: one ledger for leases and shifts, built around WhatsApp and the person on the ground. It also argues against building a marketplace or an AI advisor first. <span class="tag t-op" style="background:#33605c;color:#fff">Opinion</span></p></div>
+</section>
+
+<!-- ============ REGION ============ -->
+<section class="slide" id="countries" data-section="Region" data-title="Four countries, four rulebooks">
+  <p class="kicker">Rules and money, by country</p>
+  <h2>Four countries, four rulebooks. Rules must be settings, not code.</h2>
+  <div data-tabs class="mt-s">
+    <div class="tabs"><button>Bahrain</button><button>Jordan</button><button>Saudi Arabia</button><button>UAE</button><button>Side by side</button></div>
+    <div class="tabpanel">
+      <div class="cols c3">
+        <div class="panel"><h3>Leases (Law 27/2014)</h3><ul class="ticks" style="font-size:17px">
+          <li>Register within <b>1 month</b> on bahrain.bh; BD 5, paid by the landlord <span class="tag t-data">Data</span></li>
+          <li><b>An unregistered lease can't go to the Rent Disputes Committee</b>; electricity and water (EWA) won't connect without one <span class="tag t-data">Data</span></li>
+          <li>Deposit ≤ <b>1 month</b>; advance rent ≤ 3 months <span class="tag t-data">Data</span></li>
+          <li>Increase: none within 2 years, then max <b>5%</b> (residential) with 3 months' notice <span class="tag t-data">Data</span></li>
+          <li>Eviction after <b>2 consecutive months</b> unpaid <span class="tag t-data">Data</span></li></ul></div>
+        <div class="panel"><h3>Short stays &amp; tax</h3><ul class="ticks" style="font-size:17px">
+          <li>Furnished flats let for <b>≤1 month fall outside the rent law</b>; they count as tourism <span class="tag t-data">Data</span></li>
+          <li>No published "holiday home" permit; a grey area <span class="tag t-asm">Assumption</span></li>
+          <li>VAT 10%: residential leases exempt <span class="tag t-data">Data</span></li>
+          <li>~10% municipal tax when the occupant is an expat, charged on the EWA bill <span class="tag t-est">Estimate</span></li></ul></div>
+        <div class="panel sea"><h3>Money &amp; data</h3><ul class="ticks" style="font-size:17px">
+          <li>Fawri+, BenefitPay, Fawateer; reachable via <b>Tap</b> <span class="tag t-data">Data</span></li>
+          <li>Data-protection law has an 83-country adequacy list (incl. EU/US/KSA/UAE/Jordan), so cloud hosting is fine <span class="tag t-data">Data</span></li>
+          <li>A <b>RERA licence</b> is needed only if we ever manage property for others <span class="tag t-data">Data</span></li></ul></div>
+      </div>
+    </div>
+    <div class="tabpanel">
+      <div class="cols c3">
+        <div class="panel"><h3>Leases</h3><ul class="ticks" style="font-size:17px">
+          <li><b>No national e-registry.</b> Written lease plus stamp duty (rate for leases unconfirmed) <span class="tag t-data">Data</span></li>
+          <li>A signed lease is directly enforceable for unpaid rent at the Execution Department <span class="tag t-data">Data</span></li>
+          <li>Eviction needs a <b>notarial notice <span class="ar">إنذار عدلي</span></b> and a 15-day clock <span class="tag t-data">Data</span></li></ul></div>
+        <div class="panel pom"><h3>The farm: licensing is murky</h3><ul class="ticks" style="font-size:17px">
+          <li>2019 guest-house rules gave only preliminary approvals; 2021: <b>detention for unlicensed farms</b> <span class="tag t-data">Data</span></li>
+          <li>2022: moved to municipalities; Civil Defence plus Health approval if there is a pool <span class="tag t-data">Data</span></li>
+          <li>Bylaw 50/2025 replaced licences with "approval"; whether farms are covered is unclear <span class="tag t-asm">Assumption</span></li>
+          <li>Aug 2026: the sector calls itself "effectively unregulated" <span class="tag t-data">Data</span></li>
+          <li><b>Action: ask a Jordanian lawyer</b></li></ul></div>
+        <div class="panel sea"><h3>Money, tax &amp; data</h3><ul class="ticks" style="font-size:17px">
+          <li><b>CliQ</b>: 84M transactions in 2024; request-to-pay and refunds built in <span class="tag t-data">Data</span></li>
+          <li>eFAWATEERcom for recurring "bills"; PayTabs, HyperPay, MEPS <span class="tag t-data">Data</span></li>
+          <li>Residential rent exempt from 16% GST; rental income taxed at 5–30%; buildings &amp; lands tax <span class="ar">مسقفات</span> <span class="tag t-data">Data</span></li>
+          <li>Data-protection law 24/2023: transfers abroad need equivalence or consent <span class="tag t-data">Data</span></li></ul></div>
+      </div>
+    </div>
+    <div class="tabpanel">
+      <div class="cols c3">
+        <div class="panel"><h3>Leases (Ejar)</h3><ul class="ticks" style="font-size:17px">
+          <li>The Ejar lease is an <b>executory instrument <span class="ar">سند تنفيذي</span></b>: straight to the Enforcement Court <span class="tag t-data">Data</span></li>
+          <li>Residential rent counts as paid <b>only through Ejar's SADAD or mada</b> (since Jan 2024) <span class="tag t-data">Data</span></li>
+          <li><b>Riyadh 5-year rent freeze</b> (Sep 2025); auto-renewal with 60-day notice nationwide <span class="tag t-data">Data</span></li>
+          <li>No public Ejar API; access via licensed brokers <span class="tag t-data">Data</span></li></ul></div>
+        <div class="panel"><h3>Short stays (istiraha, chalet)</h3><ul class="ticks" style="font-size:17px">
+          <li>Ministry of Tourism licence (~SAR 1,100/yr), <b>individual applicants must be Saudi nationals</b> <span class="tag t-est">Estimate</span></li>
+          <li>Platforms must delist unlicensed units; fines up to SAR 1M <span class="tag t-data">Data</span></li>
+          <li>15% VAT on short stays; residential leases exempt <span class="tag t-data">Data</span></li></ul></div>
+        <div class="panel sea"><h3>Money &amp; data</h3><ul class="ticks" style="font-size:17px">
+          <li>Moyasar, HyperPay, Tap, PayTabs <span class="tag t-data">Data</span></li>
+          <li><b>Holding customer funds = central-bank (SAMA)-licensed activity.</b> Settle straight to the landlord <span class="tag t-data">Data</span></li>
+          <li>SMS sender IDs must be registered with the regulator (CST) <span class="tag t-data">Data</span></li></ul></div>
+      </div>
+    </div>
+    <div class="tabpanel">
+      <div class="cols c3">
+        <div class="panel"><h3>Dubai</h3><ul class="ticks" style="font-size:17px">
+          <li>Ejari mandatory; the disputes centre hears only registered tenancies <span class="tag t-data">Data</span></li>
+          <li>Smart Rental Index bands; 90-day notice for increases <span class="tag t-data">Data</span></li>
+          <li>5% housing fee via the electricity/water (DEWA) bill <span class="tag t-data">Data</span></li>
+          <li>Holiday-home permit; 2026 relief waived fees <span class="tag t-data">Data</span></li></ul></div>
+        <div class="panel"><h3>Abu Dhabi</h3><ul class="ticks" style="font-size:17px">
+          <li>Tawtheeq mandatory; <b>0% rent-increase cap since Jun 2026</b> <span class="tag t-data">Data</span></li>
+          <li><b>Farmhouses can get holiday-home permits</b>; platforms delist unlicensed units within 30 days <span class="tag t-data">Data</span></li></ul></div>
+        <div class="panel sea"><h3>Money</h3><ul class="ticks" style="font-size:17px">
+          <li>Bounced cheques decriminalised in 2022, so cheques are a weaker guarantee <span class="tag t-data">Data</span></li>
+          <li>Direct debit (UAEDDS) linked to Ejari; Aani instant payments <span class="tag t-data">Data</span></li>
+          <li>VAT 5%; residential exempt, holiday homes standard-rated <span class="tag t-data">Data</span></li></ul></div>
+      </div>
+    </div>
+    <div class="tabpanel">
+      <table class="grid" style="font-size:15.5px">
+        <tr><th>Topic</th><th>Bahrain</th><th>Jordan</th><th>KSA</th><th>UAE</th></tr>
+        <tr><td>Lease registry</td><td>bahrain.bh, 1 month, BD 5</td><td>None (stamp duty)</td><td>Ejar, mandatory</td><td>Ejari / Tawtheeq</td></tr>
+        <tr><td>Rent control</td><td>5% / 2 yrs</td><td>Contractual</td><td>Riyadh freeze</td><td>Index bands / 0% AD</td></tr>
+        <tr><td>Short-stay licence</td><td>Tourism (grey)</td><td>Farm approval (murky)</td><td>Ministry of Tourism, Saudis only</td><td>DET / DCT permits</td></tr>
+        <tr><td>Instant pay</td><td>Fawri+, BenefitPay</td><td>CliQ</td><td>SADAD 153 (Ejar), mada</td><td>Aani, UAEDDS</td></tr>
+        <tr><td>Gateway</td><td>Tap</td><td>PayTabs, HyperPay</td><td>Moyasar, HyperPay</td><td>N-Genius, Checkout</td></tr>
+        <tr><td>Currency</td><td>BHD (3 decimals)</td><td>JOD (3 decimals)</td><td>SAR</td><td>AED</td></tr>
+      </table>
+      <p class="small mt-s">All four currencies are pegged to the USD. BHD and JOD use fils (1/1000), so amounts must be stored as integers with a per-currency exponent.</p>
+    </div>
+  </div>
+  <div class="src"><b>Sources (selected; full list in discovery/01-discovery/raw/regulation-payments.md)</b><ul>
+    <li>Bahrain Law 27/2014: <a href="https://www.lloc.gov.bh/Legislation/HTM/K2714" target="_blank">LLOC</a>; Law 10/2020 (EWA): <a href="https://www.lloc.gov.bh/FullEn/K1020.docx" target="_blank">LLOC</a>; registration: <a href="https://www.bahrain.bh/wps/portal/en/BNP/ServicesCatalogue/GSX-UI-PServiceDetails?psID=2428" target="_blank">bahrain.bh</a></li>
+    <li>Jordan eviction: <a href="https://lawpedia.jo/?p=36668" target="_blank">Lawpedia</a>; farms: <a href="https://jordannews.jo/Section-109/News/Farm-owners-scramble-in-bid-to-get-licenses-for-their-venues-11787" target="_blank">Jordan News 2022</a>; CliQ volumes: <a href="https://www.jopacc.com/node/565" target="_blank">JoPACC</a></li>
+    <li>KSA: <a href="https://www.kslaw.com/insights/articles/saudi-arabia-introduces-rent-controls-and-automatic-lease-renewal" target="_blank">King &amp; Spalding</a>, <a href="https://www.agbi.com/tourism/2025/01/clampdown-unlicensed-saudi-arabia-hospitality/" target="_blank">AGBI</a>, <a href="https://rulebook.sama.gov.sa/en/entiresection/1454" target="_blank">SAMA</a></li>
+    <li>UAE: <a href="https://khaleejtimes.com/uae/abu-dhabi-temporarily-freezes-rent-for-residential-commercial-industrial-properties" target="_blank">Abu Dhabi freeze</a>, <a href="https://www.mediaoffice.abudhabi/en/tourism/department-of-culture-and-tourism-abu-dhabi-extends-holiday-homes-permits-to-include-farmhouses/" target="_blank">farmhouse permits</a></li>
+  </ul><p><b>Not legal advice.</b> Before encoding any rule, a lawyer should confirm: the Jordan farm permit regime, Jordan lease stamp duty, and Bahrain's short-stay category.</p></div>
+</section>
+
+<section class="slide" id="reg-implications" data-section="Region" data-title="What the rules mean for the product">
+  <p class="kicker">Implications</p>
+  <h2>Five things the product must do because of the rules</h2>
+  <div class="cols c5 mt">
+    <div class="panel"><div class="big-num" style="font-size:40px">01</div><h3 class="mt-s">Never hold the money</h3><p>Payment links that pay out <b>straight to the owner</b>, plus "mark as paid + attach proof". No pooled accounts, which need a licence in every country.</p></div>
+    <div class="panel"><div class="big-num" style="font-size:40px">02</div><h3 class="mt-s">Keep evidence</h3><p>Timestamped leases, receipts, notices and photos. Disputes in all four countries turn on registration and proof.</p></div>
+    <div class="panel"><div class="big-num" style="font-size:40px">03</div><h3 class="mt-s">Rules as settings</h3><p>Rent caps, notice periods, deposit limits and freezes per jurisdiction, editable without code. 2026 alone brought three emergency changes.</p></div>
+    <div class="panel"><div class="big-num" style="font-size:40px">04</div><h3 class="mt-s">Two rental modes</h3><p><b>Tenancy</b> (rent law applies) vs <b>stay</b> (tourism rules apply). Licence fields are optional but tracked.</p></div>
+    <div class="panel"><div class="big-num" style="font-size:40px">05</div><h3 class="mt-s">Money done right</h3><p>3-decimal currencies, USD pegs, Hijri dates shown, Fri–Sat weekends (Sat–Sun in UAE).</p></div>
+  </div>
+  <div class="panel saffron mt"><p style="font-size:20px"><b>Why Bahrain + Jordan first is lucky:</b> neither has an Ejar-style system that already covers rent collection, and Bahrain's rules are clearly written. The KSA and UAE long-term markets are both more regulated and more crowded. <span class="tag t-op">Opinion</span></p></div>
+</section>
+
+<!-- ============ VOICE ============ -->
+<section class="slide" id="voices" data-section="Voice" data-title="In their own words">
+  <p class="kicker">Customer voice: real quotes from app reviews, forums and news</p>
+  <h2>Trust keeps coming up: deposits, caretakers, platforms</h2>
+  <div class="cols c3 mt" style="gap:22px 34px">
+    <p class="quote"><span class="ar">تحصيل الإيجارات بدائياً يسمح لهم بالتلاعب</span>"Primitive rent collection lets them [the building guards] manipulate."<cite>Tenant, Kuwait · Al Rai</cite></p>
+    <p class="quote"><span class="ar">نحن في عصر التكنولوجيا حيث يستطيع المالك مراقبة حركة الإيجارات</span>"We're in the age of technology, where an owner can monitor rent flows."<cite>Tenant, Kuwait · Al Rai (in effect describing the product)</cite></p>
+    <p class="quote">"No link to other platforms' calendar, no insurance on breaching host's stay policy."<cite>Host, KSA · Gathern Business app review</cite></p>
+    <p class="quote">"They allowed the owner to claim nearly 75% of the total booking cost from my insurance deposit."<cite>Guest, KSA · Gathern app review</cite></p>
+    <p class="quote">"He told me it's business, just pay what is on you, bye!"<cite>Tenant, Bahrain · landlord claimed BD 710 against a BD 380 deposit · expat.com</cite></p>
+    <p class="quote">"The issue of tenants delaying or failing to pay rent is a major concern… landlords are withdrawing from the market."<cite>Real Estate Committee, Bahrain Businessmen's Assoc. · 2025</cite></p>
+    <p class="quote"><span class="ar">أسعار الاستراحات تقفز عادة للضعف… 3 أضعاف أيام الأعياد</span>"Istiraha prices usually double… triple at Eid."<cite>Guests, KSA · Al Watan</cite></p>
+    <p class="quote">"I believe that such decisions will scare people off."<cite>Farm owner, Jordan · on jail for unlicensed farms · Jordan News 2021</cite></p>
+    <p class="quote">"All remaining post-dated cheques have since bounced and there's nothing much we could do about it."<cite>Owner, Dubai · Gulf News</cite></p>
+  </div>
+  <div class="src"><b>Sources</b><ul>
+    <li><a href="https://www.alraimedia.com/article/878372/" target="_blank">Al Rai: building guards "I'm the manager"</a></li>
+    <li><a href="https://apps.apple.com/sa/app/id1208123256?see-all=reviews" target="_blank">Gathern Business reviews</a> · <a href="https://apps.apple.com/sa/app/id1226060828?see-all=reviews" target="_blank">Gathern guest reviews</a> (4.4★ overall; complaints are a minority)</li>
+    <li><a href="https://www.expat.com/en/forum/middle-east/bahrain/1007569-help-landlord-is-asking-to-pay-for-the-damages.html" target="_blank">expat.com Bahrain</a> · <a href="https://www.newsofbahrain.com/bahrain/108238.html" target="_blank">Daily Tribune</a></li>
+    <li><a href="https://www.alwatan.com.sa/article/1046048" target="_blank">Al Watan</a> · <a href="https://jordannews.jo/Section-109/News/Authorities-will-jail-people-who-rent-their-farms-without-licences-official-source-5398" target="_blank">Jordan News</a> · <a href="https://gulfnews.com/uae/uae-holiday-home-firms-leave-homeowners-in-the-lurch-1.68555662" target="_blank">Gulf News</a></li>
+  </ul><p><b>Gaps:</b> Reddit and Arabic Facebook groups couldn't be reached. <b>No first-person quotes from owners managing from abroad or from Jordanian farm guests.</b> Several sources date from 2016–2021.</p></div>
+</section>
+
+<section class="slide" id="pains" data-section="Voice" data-title="Pain map & segment signal">
+  <p class="kicker">What the quotes add up to</p>
+  <h2>Pains ranked, and which owner group feels them most</h2>
+  <div class="cols c-6-4 mt">
+    <table class="grid">
+      <tr><th>Pain</th><th>How often</th><th>How bad</th><th>Today's workaround</th></tr>
+      <tr><td>Deposit and damage disputes</td><td>High</td><td>Medium; destroys trust</td><td>Pay up to avoid court; bad reviews</td></tr>
+      <tr><td>Non-payment, bounced cheques</td><td>Medium</td><td>Very high</td><td>6–12 months upfront; police; Ejar enforcement</td></tr>
+      <tr><td>Untrustworthy middlemen (guards, agents, operators)</td><td>Medium</td><td>Very high (theft, loss of control)</td><td>Owner shows up to collect cash</td></tr>
+      <tr><td>Short-stay platform friction (commission, payouts, calendars)</td><td>Med-high</td><td>Med-high</td><td>Listing on several platforms</td></tr>
+      <tr><td>Guest distrust (photos, hidden deposits, Eid pricing)</td><td>Medium</td><td>Medium</td><td>Ask for more photos, pay deposit by transfer</td></tr>
+      <tr><td>Rules and licensing</td><td>Low-med</td><td>High when enforced</td><td>Rent unlicensed or off-platform</td></tr>
+    </table>
+    <div>
+      <div class="panel saffron"><h3>Most frequent pain: farm, chalet and istiraha owners</h3><p>Hosts describe concrete software gaps in their own words. <span class="tag t-data">Data</span> Caveat: most of these voices are Saudi, not Jordanian.</p></div>
+      <div class="panel mt-s"><h3>Most intense pain: GCC landlords</h3><p>But government systems (Ejar, Ejari, dispute courts) already own enforcement. <span class="tag t-op">Opinion</span></p></div>
+      <div class="panel pom mt-s"><h3>Unproven: owners managing from abroad</h3><p>We found zero first-person quotes. It could be the most emotional pain ("loss of control") or it might not exist. <b>Interviews decide.</b> <span class="tag t-asm">Assumption</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="language" data-section="Voice" data-title="Their words (for later copy)">
+  <p class="kicker">Language map</p>
+  <h2>The words owners and guests actually use</h2>
+  <div class="cols c3 mt">
+    <div class="panel"><h3>The problem</h3><p class="ar" style="font-size:24px;line-height:1.9;text-align:right">العربون · التأمين · تحصيل الإيجارات · التلاعب · حارس العمارة · «أنا المدير» · مماطلة · شيك مرتجع · إنذار عدلي · سند تنفيذي · عمولة · خارج المنصة</p><p class="small mt-s">booking deposit, damage deposit, rent collection, manipulation, building guard, "I'm the manager", stalling, bounced cheque, notarial notice, enforceable deed, commission, off-platform</p></div>
+    <div class="panel"><h3>The frustration</h3><p class="ar" style="font-size:24px;line-height:1.9;text-align:right">غير منصف · يهتم بالمال · مبالغ فيها · تقفز للضعف · يتصرف بأملاكي على هواه</p><p class="small mt-s">"without any recourse" · "nothing much we could do" · "the hassle" · "highest cut" · "minor wear and tear? Deducted."</p></div>
+    <div class="panel olive"><h3>The outcome they want</h3><p class="ar" style="font-size:24px;line-height:1.9;text-align:right">يستطيع المالك مراقبة حركة الإيجارات · مصورة الأضرار · فترة صباحية / مسائية · مبيت</p><p class="small mt-s">"monitor" · "documented" · "peace of mind" (our inference)</p></div>
+  </div>
+  <p class="small mt">These words go straight into future landing pages. Copy that mirrors customers' own language converts better than copy we invent.</p>
+</section>
+
+<!-- ============ STRATEGY ============ -->
+<section class="slide" id="directions" data-section="Strategy" data-title="Five possible directions">
+  <p class="kicker">Options, not answers</p>
+  <h2>Five directions we could take</h2>
+  <div data-tabs class="mt-s">
+    <div class="tabs"><button>A · Remote owner's command centre</button><button>B · Farm &amp; chalet shift system</button><button>C · Owner + caretaker co-pilot</button><button>D · Loujane's tool only</button><button>E · Managed service on our software</button></div>
+    <div class="tabpanel"><div class="cols c-6-4">
+      <div><p class="lead">For owners of 1–6 units "back home" who live elsewhere, such as Jordanians in the Gulf, or Gulf nationals with property abroad. Shows rent status, renewals, receipts and profit in their currency, with WhatsApp nudges in Arabic sent on their behalf.</p>
+      <ul class="ticks mt"><li><b>For:</b> a clear gap; Gulf salaries pay for it; we only track money, never hold it.</li><li><b>Against:</b> few events a year, so habits and retention are hard; still needs someone on the ground; a good spreadsheet can copy it.</li></ul></div>
+      <div class="panel"><h3>Risk: medium-high (retention)</h3><p>Year 1: 30 owners in a free beta from Jordanian community groups in Riyadh, Dubai and Doha; paid tier by month 6; target 150 paying.</p></div></div></div>
+    <div class="tabpanel"><div class="cols c-6-4">
+      <div><p class="lead">A shift calendar, booking link, CliQ deposit tracking, caretaker checklists and damage-deposit settlement for Jordanian farms, then Saudi istirahas and Bahraini chalets.</p>
+      <ul class="ticks mt"><li><b>For:</b> weekly use in season, so it becomes a habit; acute pain (double-booking, lost deposits); no owner-side tool exists; Loujane is an insider.</li><li><b>Against:</b> ~2,500 rented farms caps the Jordan market; many owners are informal and cash-based; Gathern could add owner tools in KSA.</li></ul></div>
+      <div class="panel"><h3>Risk: medium (market size)</h3><p>Year 1: concierge service for Loujane's farm + 10 others; 50 paying farms by month 9; then test 10 istiraha owners and Bahrain chalets.</p></div></div></div>
+    <div class="tabpanel"><div class="cols c-6-4">
+      <div><p class="lead">Built around the caretaker <span class="ar">ناطور</span>, cleaner or relative who actually turns the key. Voice notes become tasks; photos and timestamps become proof for the owner.</p>
+      <ul class="ticks mt"><li><b>For:</b> this is where trust breaks today; fits A and B; voice-to-task works well in 2026.</li><li><b>Against:</b> low-end phones, resistance to being monitored; more a feature than a business.</li></ul></div>
+      <div class="panel"><h3>Verdict: a module, not a brand</h3><p>Build it inside whichever direction wins.</p></div></div></div>
+    <div class="tabpanel"><div class="cols c-6-4">
+      <div><p class="lead">Build only for Loujane. No pricing, no landing page, no other users until it has run her whole portfolio for 2–3 months.</p>
+      <ul class="ticks mt"><li><b>For:</b> nearly zero cost, maximum learning, no pressure on family life.</li><li><b>Against:</b> fits one owner too closely; can drift into a hobby.</li></ul></div>
+      <div class="panel"><h3>Verdict: phase 0 of every option</h3><p>8–12 weeks, with a clear "graduate or stop" moment.</p></div></div></div>
+    <div class="tabpanel"><div class="cols c-6-4">
+      <div><p class="lead">Loujane, or a coordinator we hire, manages other remote owners' flats and farms for a fee (5–8% of rent; 15–20% of farm bookings). The software is our internal tool.</p>
+      <ul class="ticks mt"><li><b>For:</b> owners pay for results, not dashboards; revenue comes in fast; the software gets tested hard.</li><li><b>Against:</b> a people business; needs a property-manager licence in Bahrain; competes with day jobs.</li></ul></div>
+      <div class="panel"><h3>Risk: operational</h3><p>An add-on to A, not a starting point.</p></div></div></div>
+  </div>
+</section>
+
+<section class="slide" id="recommendation" data-section="Strategy" data-title="Our recommendation (to debate)">
+  <p class="kicker">Combining the research</p>
+  <h2>Recommendation: one engine for Loujane's mixed portfolio; the farm module goes to market first</h2>
+  <div class="cols c3 mt">
+    <div class="panel"><h3>Step 1 · Loujane's portfolio</h3><p class="small">Option D · weeks 0–12</p><p class="mt-s">One shared ledger runs her Bahrain flats, Jordan flats and the farm. Success test: she stops opening Excel, and the farm has zero double-bookings.</p></div>
+    <div class="panel saffron"><h3>Step 2 · Farm owners in Jordan</h3><p class="small">Option B (+ C) · months 3–9</p><p class="mt-s">The sharpest, most frequent pain, with no owner-side tool. Loujane can sell it in person. Charge from day one.</p></div>
+    <div class="panel"><h3>Step 3 · Owners managing from abroad</h3><p class="small">Option A (+ E later) · months 9–18</p><p class="mt-s">The same ledger, reminders and caretaker module, aimed at Jordanians in the Gulf. Start only if step 2 passes.</p></div>
+  </div>
+  <div class="cols c2 mt">
+    <div class="panel pom"><h3>Not now (written down on purpose)</h3><p>Vendor marketplace · tenant-finding portal · "sell / renovate" AI · long-term rentals in KSA or UAE · holding money · native apps · full accounting.</p></div>
+    <div class="panel"><h3>Where the research disagreed</h3><p>The competitor research ranks <b>owners abroad</b> as the biggest gap. The strategist ranks <b>farm shifts</b> first because people feel that pain every week. We chose to sequence them because they share one engine. <b>This is the first decision for you to make.</b> <span class="tag t-op">Opinion</span></p></div>
+  </div>
+</section>
+
+<section class="slide" id="smart" data-section="Strategy" data-title="What 'smart' should mean">
+  <p class="kicker">AI, honestly</p>
+  <h2>"Smart" should mean less typing, not predictions</h2>
+  <div class="cols c2 mt">
+    <div class="panel olive"><h3>Build: realistic in 2026</h3>
+      <table class="grid" style="font-size:16px">
+        <tr><td>Voice note in Arabic → maintenance ticket</td><td>Caretakers and tenants already send voice notes</td></tr>
+        <tr><td>Receipt or CliQ screenshot → expense or payment</td><td>The most frequent typing; watch for 3-decimal amounts</td></tr>
+        <tr><td>Contract photo → lease record</td><td>Gets an owner set up in minutes</td></tr>
+        <tr><td>Match transfers to rent due</td><td>Suggests a match; a person confirms</td></tr>
+        <tr><td>WhatsApp booking and FAQ assistant</td><td>Allowed if task-specific (Meta banned general chatbots from Jan 2026)</td></tr>
+        <tr><td>Monthly report written in plain language</td><td>Arabic or English, to share with family</td></tr>
+        <tr><td>Farm price suggestions</td><td>Simple rules first ("Eid night +40%"); learn from data after 1–2 seasons</td></tr>
+      </table></div>
+    <div class="panel pom"><h3>Avoid or postpone: no data behind it</h3>
+      <table class="grid" style="font-size:16px">
+        <tr><td>"Should I sell?" / valuations</td><td>No price data in Bahrain; Jordan's public index dates from 2018</td></tr>
+        <tr><td>"Renovate for +X% return"</td><td>No comparable outcomes; a calculator at most</td></tr>
+        <tr><td>Predictive maintenance</td><td>No sensors; 5–15 units is too few. Use scheduled maintenance: AC before summer, tank cleaning, pool</td></tr>
+        <tr><td>Tenant risk scores</td><td>No credit bureau access; discrimination risk</td></tr>
+        <tr><td>AI negotiating or confirming bookings by itself</td><td>Trust and legal risk; AI drafts, a person confirms</td></tr>
+      </table>
+      <p class="small mt-s">"Raise rent?" becomes a <b>rules check</b> instead: is it allowed, how much, and what notice is required. Useful, and correct.</p></div>
+  </div>
+  <div class="src"><b>Sources</b><ul>
+    <li>WhatsApp general-purpose chatbot ban: <a href="https://techcrunch.com/2025/10/18/whatssapp-changes-its-terms-to-bar-general-purpose-chatbots-from-its-platform/" target="_blank">TechCrunch</a>; pricing: <a href="https://developers.facebook.com/docs/whatsapp/pricing" target="_blank">Meta</a></li>
+    <li>Data availability: <a href="https://rei.rega.gov.sa/en/advanced-search/rental-market" target="_blank">REGA rental index</a> (KSA, good); <a href="https://www.cbre.com/insights/figures/bahrain-real-estate-market-snapshot-h1-2026" target="_blank">CBRE Bahrain</a> (aggregate only)</li>
+  </ul></div>
+</section>
+
+<section class="slide" id="concept" data-section="Strategy" data-title="A first sketch (not a design)">
+  <p class="kicker">To help us picture it</p>
+  <h2>A rough sketch of Loujane's "today" screen</h2>
+  <div style="display:grid;grid-template-columns:380px 380px 1fr;gap:36px;margin-top:18px;align-items:start">
+    <div class="phone"><div class="scr">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-family:var(--display);font-size:20px">Thursday 6 Nov</b><span class="small" style="font-size:12px">15 Jumada I</span></div>
+      <div class="card" style="background:var(--ink);color:#fff;border:0"><span style="font-size:12px;opacity:.8">November so far</span><div style="font-family:var(--display);font-size:24px;font-weight:800;margin:4px 0">1,240.500 JOD · 610.000 BHD</div><span style="font-size:12px;opacity:.85">4 of 5 rents in · farm 9 shifts booked</span></div>
+      <div class="card"><span class="pill" style="background:var(--saffron-soft)">Farm · tonight</span><br><b>Night shift, 22:00 → 09:00</b><br>Family of 14 · balance 60 JOD due at check-in<br><span class="act">Send rules + location</span></div>
+      <div class="card"><span class="pill" style="background:var(--pom-soft)">Rent · 5 days late</span><br><b>Manama flat 12</b> · 210.000 BHD<br>Reminder 2 drafted, polite tone<br><span class="act">Send on WhatsApp</span><span class="act alt">Call</span></div>
+      <div class="card"><span class="pill" style="background:var(--olive-soft)">Caretaker · voice note</span><br><b>"Pool pump is making noise"</b><br>2 quotes: 35 / 48 JOD<br><span class="act">Approve 35</span><span class="act alt">Listen</span></div>
+      <div class="card"><span class="pill" style="background:var(--sea-soft)">Renewal · 62 days</span><br><b>Amman flat 3</b>: max increase is your call (Jordan: contract-based)</div>
+    </div></div>
+    <div class="phone"><div class="scr">
+      <b style="font-family:var(--display);font-size:20px">Farm · this week</b>
+      <div style="display:grid;grid-template-columns:48px 1fr 1fr;gap:6px;margin-top:14px;font-size:12.5px">
+        <span></span><b>Day</b><b>Night</b>
+        <span>Sun</span><span class="pill" style="background:#eee">free · 80</span><span class="pill" style="background:#eee">free · 70</span>
+        <span>Mon</span><span class="pill" style="background:#eee">free · 80</span><span class="pill" style="background:var(--olive-soft)">booked</span>
+        <span>Tue</span><span class="pill" style="background:#eee">free · 80</span><span class="pill" style="background:#eee">free · 70</span>
+        <span>Wed</span><span class="pill" style="background:var(--olive-soft)">booked</span><span class="pill" style="background:#eee">free · 70</span>
+        <span>Thu</span><span class="pill" style="background:var(--saffron-soft)">hold 6h</span><span class="pill" style="background:var(--olive-soft)">booked</span>
+        <span>Fri</span><span class="pill" style="background:var(--olive-soft)" >24h · booked</span><span class="pill" style="background:var(--olive-soft)">(24h)</span>
+        <span>Sat</span><span class="pill" style="background:var(--olive-soft)">booked</span><span class="pill" style="background:#eee">free · 85</span>
+      </div>
+      <div class="card"><b>Share availability</b><br><span style="font-size:12.5px">mosbah.link/farm-loujane: guests see free shifts and prices, and pay the deposit by CliQ</span></div>
+      <div class="card"><b>Thursday hold expires in 6h</b><br><span style="font-size:12.5px">Deposit 40 JOD not received</span><br><span class="act">Nudge</span><span class="act alt">Release</span></div>
+      <div class="card"><b>Last checkout</b>: 2 photos flagged<br><span style="font-size:12.5px">Broken chair → deduct 15 JOD from 50 deposit?</span></div>
+    </div></div>
+    <div>
+      <div class="panel"><h3>What this sketch is saying</h3>
+        <ul class="ticks" style="font-size:18px">
+          <li>The home screen is <b>a short list of things to do today</b>, not a dashboard.</li>
+          <li>Every card has <b>one obvious action</b>. Most actions send a WhatsApp message.</li>
+          <li>Two currencies are shown side by side, each with its correct decimals. Hijri date at the top.</li>
+          <li>The farm calendar has <b>shift slots</b>, not nights.</li>
+          <li>The caretaker's voice note became a task with quotes attached.</li>
+        </ul></div>
+      <p class="small mt-s">Sketch only. Every number is invented. Real design comes after the PRD.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="model" data-section="Strategy" data-title="The core data model">
+  <p class="kicker">How the engine is organised (for Subhi)</p>
+  <h2>One ledger underneath both leases and shift bookings</h2>
+  <div style="position:relative;height:600px;margin-top:20px">
+    <svg viewBox="0 0 1380 600" width="1380" height="600" style="position:absolute;inset:0" stroke="#3E5F5C" stroke-width="1.5" fill="none">
+      <path d="M190 78 V140"/>
+      <path d="M150 200 V235 H125 V270"/><path d="M230 200 V235 H420 V270"/>
+      <path d="M125 330 V410"/><path d="M420 330 V410"/>
+      <path d="M115 475 V500 H640 V470"/>
+      <path d="M500 440 H600"/>
+      <path d="M680 330 V410"/>
+      <path d="M690 472 V520"/>
+      <path d="M860 440 H760"/>
+      <path d="M965 340 V410"/>
+      <path d="M965 520 V472"/>
+    </svg>
+    <div class="ent" style="position:absolute;left:100px;top:20px;width:180px"><b>Portfolio</b>owner or family; reporting currency</div>
+    <div class="ent" style="position:absolute;left:100px;top:140px;width:180px"><b>Property</b>building, villa, farm; country, rules</div>
+    <div class="ent" style="position:absolute;left:30px;top:270px;width:190px"><b>Unit</b>flat 3B; furnished?</div>
+    <div class="ent" style="position:absolute;left:320px;top:270px;width:200px;border-color:var(--olive)"><b>Space × Shift</b>whole farm × Day/Night/24h</div>
+    <div class="ent" style="position:absolute;left:30px;top:410px;width:170px"><b>Lease</b>term, rent schedule, deposit, reg. no.</div>
+    <div class="ent" style="position:absolute;left:330px;top:410px;width:170px;border-color:var(--olive)"><b>Booking</b>hold → confirmed → closed</div>
+    <div class="ent" style="position:absolute;left:600px;top:410px;width:160px;background:var(--ink);color:#fff"><b style="color:var(--saffron)">Ledger</b>charges, payments, expenses</div>
+    <div class="ent" style="position:absolute;left:600px;top:270px;width:160px"><b>Party</b>tenant, guest, vendor, caretaker</div>
+    <div class="ent" style="position:absolute;left:600px;top:520px;width:170px"><b>Document</b>contract, receipt, ID, photo</div>
+    <div class="ent" style="position:absolute;left:860px;top:410px;width:180px"><b>Work order</b>issue → quotes → approve → expense</div>
+    <div class="ent" style="position:absolute;left:880px;top:270px;width:170px"><b>Inspection</b>in/out, checkout; vs inventory</div>
+    <div class="ent" style="position:absolute;left:880px;top:520px;width:170px"><b>Message</b>WhatsApp in/out; voice → text</div>
+    <div class="panel" style="position:absolute;right:0;top:20px;width:300px"><h3>Principles</h3><ul class="ticks" style="font-size:16px">
+      <li>Lease and Booking are <b>two kinds of agreement that feed one ledger</b></li>
+      <li>Money stored as integer fils or halalas, with exchange rate per entry</li>
+      <li>Every number links back to a document</li>
+      <li>Rules per jurisdiction stored as data</li>
+      <li>The caretaker is a Party with a role, not a user account</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" id="roadmap" data-section="Strategy" data-title="Phased roadmap">
+  <p class="kicker">Phases, with gates</p>
+  <h2>A roadmap where each phase has to earn the next</h2>
+  <div class="cols c3 mt">
+    <div class="panel"><h3>Phase 0 · Loujane (8–12 wks)</h3>
+      <ul class="ticks" style="font-size:16.5px"><li>Properties, units, farm shifts; BHD + JOD</li><li>Leases + rent schedule; farm bookings with deposits</li><li>Ledger, screenshot and receipt capture, profit by unit and country</li><li>WhatsApp reminders + caretaker inbox</li><li>Work orders + quote comparison; inspections with photos</li><li>Monthly report; import from Excel</li></ul>
+      <p class="small mt-s"><b>Gate:</b> Loujane uses it weekly for 8 weeks, makes zero double-bookings, and gets her monthly profit in under 10 minutes.</p></div>
+    <div class="panel saffron"><h3>Phase 1 · Private beta (10–20 owners)</h3>
+      <ul class="ticks" style="font-size:16.5px"><li>Multiple accounts; roles: owner, co-owner, caretaker, accountant</li><li>Public booking page + CliQ / BenefitPay payment links</li><li>WhatsApp assistant (owner approves)</li><li>Bank-statement matching; cheque register</li><li>Rule packs per country</li><li>Farm pricing rules; subscription billing</li></ul>
+      <p class="small mt-s"><b>Gate:</b> ≥70% of owners active weekly at week 8 and ≥40% convert to paid.</p></div>
+    <div class="panel"><h3>Phase 2 · Services (12+ months)</h3>
+      <ul class="ticks" style="font-size:16.5px"><li>Vetted vendor network (commission)</li><li>Payment collection with fees</li><li>Premium services: inspections, registration help, notices</li><li>Anonymised rent comparisons for Bahrain and Jordan (where official data is missing)</li><li>Calendar sync with Gathern and Airbnb</li></ul>
+      <p class="small mt-s"><b>Gate:</b> revenue per owner, ≥15% of owners buy a service, dispute rate &lt;3%.</p></div>
+  </div>
+  <p class="small mt">Loujane's original vision (marketplace, comparing quotes, market insight) doesn't disappear. It moves to phase 2, after we've earned the data and the trust.</p>
+</section>
+
+<section class="slide" id="money" data-section="Strategy" data-title="How it could make money">
+  <p class="kicker">Business model (all prices untested)</p>
+  <h2>Who pays, and for what</h2>
+  <table class="grid mt">
+    <tr><th>Model</th><th>Fits</th><th>Price to test <span class="tag t-asm">Assumption</span></th><th>Watch out</th></tr>
+    <tr><td>Per-farm subscription</td><td>Farm module</td><td>JOD 15–25 / farm / month in season; free ≤ 8 bookings/mo</td><td>Seasonal income: maybe charge by season</td></tr>
+    <tr><td>Per-booking fee</td><td>Farm module</td><td>JOD 2–3 per confirmed booking</td><td>Owners must see the link bringing guests</td></tr>
+    <tr><td>Per-unit subscription</td><td>Owners abroad</td><td>JOD 3–5 / unit / mo · flat JOD 9 for ≤5 units</td><td>Churn. <b>Bahrain anchor: BaiTech charges 1 BHD/unit</b>, so per-unit pricing for long-term flats is a race to the bottom</td></tr>
+    <tr><td>Payment-link fee</td><td>Both</td><td>1.5–3% on card deposits; CliQ free</td><td>The payment provider is merchant of record; we never hold funds</td></tr>
+    <tr><td>Managed service</td><td>Owners abroad (later)</td><td>5–8% of rent; farms 15–20% of bookings</td><td>Licence (Bahrain RERA); people-heavy</td></tr>
+    <tr><td>White-label for small property managers</td><td>Year 2</td><td>JOD 1.5–3 / unit, min JOD 100/mo</td><td>Competes with Ajar and Mulki</td></tr>
+  </table>
+  <div class="cols c3 mt">
+    <div class="panel"><b>Benchmarks:</b> US small-landlord tools cost $0–20/mo; short-stay tools €28–40/mo; Dubai managers take 15–25%. <span class="tag t-data">Data</span></div>
+    <div class="panel"><b>Owners pay for results,</b> not dashboards. Rent collected, no double-bookings, the AC fixed. <span class="tag t-op">Opinion</span></div>
+    <div class="panel saffron"><b>Rule:</b> charge something from week one of the beta, even a token amount. Free users tell you nothing about price.</div>
+  </div>
+</section>
+
+<section class="slide" id="validation" data-section="Strategy" data-title="Cheap tests before code">
+  <p class="kicker">Testing the idea before building it</p>
+  <h2>Five cheap experiments, each with a pass/fail line</h2>
+  <table class="grid mt">
+    <tr><th>Experiment</th><th>When</th><th>Pass if…</th><th>If it fails…</th></tr>
+    <tr><td>Loujane as customer zero (WhatsApp Business + Sheet + simple booking link)</td><td>Weeks 0–8</td><td>Weekly use for 8 weeks; zero double-bookings; monthly profit in &lt;10 min</td><td>Find out why before writing code</td></tr>
+    <tr><td>15 interviews with Jordanian farm owners (ask about past behaviour, never "would you use…")</td><td>Weeks 2–6</td><td>≥10 had a costly failure in the last 3 months; ≥6 would pay ≥ JOD 15/mo or JOD 3/booking</td><td>Drop B; look at A</td></tr>
+    <tr><td>Concierge service: we run 8–10 farms' calendars by hand</td><td>Weeks 6–14</td><td>≥6 active at week 6; ≥4 pay; &gt;50% of bookings go through the link</td><td>&lt;3 active: stop B</td></tr>
+    <tr><td>Two Arabic landing pages: <span class="ar">نظّم حجوزات مزرعتك</span> vs <span class="ar">تابع شققك في الأردن وأنت في الخليج</span></td><td>Weeks 4–10</td><td>≥5% join the waitlist; ≥20% of the waitlist accept a call</td><td>Shows which segment responds more</td></tr>
+    <tr><td>15 interviews with Jordanians in the Gulf who own flats back home</td><td>Weeks 8–12</td><td>≥8 had a problem with a relative or caretaker; ≥5 would pay</td><td>Keep A parked</td></tr>
+  </table>
+  <div class="panel pom mt"><b>Agree now on when to stop (month 9):</b> fewer than 25 paying properties, or more than 10% monthly churn, or Loujane herself not using it weekly → keep it as a personal tool and stop the business track.</div>
+</section>
+
+<section class="slide" id="risks" data-section="Strategy" data-title="Top risks">
+  <p class="kicker">What could go wrong</p>
+  <h2>The eight biggest risks</h2>
+  <table class="grid mt">
+    <tr><th>Risk</th><th>Likelihood / impact</th><th>Mitigation</th></tr>
+    <tr><td>Scope creeps back to "the whole ecosystem"</td><td>High / High</td><td>A written not-now list; one asset type and one country until a gate passes</td></tr>
+    <tr><td>Small owners won't pay</td><td>High / High</td><td>Charge from week 1; test per-booking pricing</td></tr>
+    <tr><td>The Jordan farm market is too small</td><td>Med / High</td><td>Count listings early; design for istirahas and chalets from day one</td></tr>
+    <tr><td>Payment or licensing exposure</td><td>Med / High</td><td>Payment-provider links only; a lawyer checks the farm permit and data rules</td></tr>
+    <tr><td>A big player adds owner tools (Gathern, OpenSooq, BaiTech grows)</td><td>Med / Med</td><td>Win on caretaker operations and mixed portfolios; complement them with calendar sync</td></tr>
+    <tr><td>Caretakers won't use it</td><td>Med / High</td><td>WhatsApp voice notes only, no app; owner can log on their behalf</td></tr>
+    <tr><td>Founder bandwidth and family dynamics</td><td>Med / High</td><td>Clear roles, timeboxed phases, stop rules agreed upfront</td></tr>
+    <tr><td>AI gets a number or a person wrong</td><td>Low-Med / Med</td><td>AI drafts, a human confirms; every number links to its source</td></tr>
+  </table>
+</section>
+
+<section class="slide" id="gate" data-section="Strategy" data-title="Research gate: verdict">
+  <p class="kicker">Research gate (startup-design method)</p>
+  <div style="display:flex;align-items:center;gap:22px"><div class="light"><i></i><i class="y"></i><i></i></div><h2>Yellow light: go ahead with interviews, don't build a product yet</h2></div>
+  <div class="cols c3 mt2">
+    <div class="panel olive"><h3>Strongest signals</h3><ul class="ticks" style="font-size:17px"><li>No product handles mixed leases and shifts in one ledger</li><li>No landlord tool exists in Jordan; CliQ is everywhere</li><li>Farm owners' pains (double-booking, deposits, damage) are concrete and frequent</li><li>Loujane is the user, and an insider in the farm world</li></ul></div>
+    <div class="panel pom"><h3>Red flags</h3><ul class="ticks" style="font-size:17px"><li>Small market: ~2,500 rented farms in Jordan</li><li>Willingness to pay is unproven, and small landlords pay little</li><li>BaiTech already targets Bahrain landlords at 1 BHD per unit per month</li><li>Farm licensing in Jordan is unclear</li></ul></div>
+    <div class="panel saffron"><h3>What must be true</h3><ul class="ticks" style="font-size:17px"><li>Farm owners lose real money to the problems we solve, and say so unprompted</li><li>They'll pay roughly a booking's worth of profit per month</li><li>Caretakers will send photos and voice notes</li><li>Loujane keeps using it after the novelty fades</li></ul></div>
+  </div>
+  <p class="small mt">Customer interviews conducted so far: <b>0</b> (Loujane's own experience counts as founder knowledge, not as an interview). The PRD comes after ≥5 interviews pass the gate.</p>
+</section>
+
+<!-- ============ DECIDE ============ -->
+<section class="slide" id="decide-1" data-section="Decide" data-title="Decisions, part 1: direction">
+  <p class="kicker">Decide together · <span class="status-pill" data-qprogress></span></p>
+  <h2>Decisions, part 1: what this is and who it's for</h2>
+  <div class="qgrid mt">
+    <div class="q" data-q="purpose"><div class="qt"><span class="n">1</span>What is Mosbah, for us?</div><div class="opts">
+      <label><input type="radio" value="Personal tool for Loujane">Personal tool</label><label><input type="radio" value="Side business that pays for itself">Side business</label><label><input type="radio" value="Venture-scale company">Venture-scale</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="first-segment"><div class="qt"><span class="n">2</span>After Loujane, whose problem do we solve first?</div><div class="opts">
+      <label><input type="radio" value="Farm & chalet owners (B)">Farm owners</label><label><input type="radio" value="Owners managing from abroad (A)">Owners abroad</label><label><input type="radio" value="GCC small landlords">GCC landlords</label><label><input type="radio" value="Only Loujane for now">Only Loujane</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="country"><div class="qt"><span class="n">3</span>Which single country do we launch in?</div><div class="opts">
+      <label><input type="radio" value="Jordan">Jordan</label><label><input type="radio" value="Bahrain">Bahrain</label><label><input type="radio" value="Both (Loujane's two)">Both</label><label><input type="radio" value="KSA">KSA</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="loujane-role"><div class="qt"><span class="n">4</span>What is Loujane's role?</div><div class="opts">
+      <label><input type="radio" value="User & advisor">User &amp; advisor</label><label><input type="radio" value="Leads customers & sells to farm owners">Leads customers &amp; sales</label><label><input type="radio" value="Runs a managed service">Runs a service</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="subhi-time"><div class="qt"><span class="n">5</span>How much time can Subhi put in?</div><div class="opts">
+      <label><input type="radio" value="Evenings for ~6 months">Evenings</label><label><input type="radio" value="Half-time">Half-time</label><label><input type="radio" value="Full-time after a gate passes">Full-time after a gate</label></div><textarea class="other" rows="1" placeholder="Budget / hours…"></textarea></div>
+    <div class="q" data-q="stop-rule"><div class="qt"><span class="n">6</span>What would make us stop the business track?</div><div class="opts">
+      <label><input type="radio" value="<25 paying properties by month 9">&lt;25 paying by month 9</label><label><input type="radio" value="Loujane stops using it">Loujane stops using it</label><label><input type="radio" value="A big player ships the same thing">A big player copies it</label></div><textarea class="other" rows="1" placeholder="Our own rule…"></textarea></div>
+    <div class="q" data-q="keep-later"><div class="qt"><span class="n">7</span>Which of Loujane's original ideas should come back first, later?</div><div class="opts">
+      <label><input type="radio" value="Compare maintenance quotes / vendors">Vendor quotes</label><label><input type="radio" value="Market vacancies / find tenants">Find tenants</label><label><input type="radio" value="Rent & value trends">Market trends</label><label><input type="radio" value="AI advice">AI advice</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="argument-against"><div class="qt"><span class="n">8</span>Hard question: what's the strongest argument <i>against</i> doing this?</div><textarea class="other" rows="1" placeholder="Be honest…"></textarea></div>
+    <div class="q" data-q="why-us"><div class="qt"><span class="n">9</span>Hard question: why are we the right people? What do we have that others don't?</div><textarea class="other" rows="1" placeholder="Our unfair advantage…"></textarea></div>
+  </div>
+</section>
+
+<section class="slide" id="decide-2" data-section="Decide" data-title="Decisions, part 2: product shape">
+  <p class="kicker">Decide together · <span class="status-pill" data-qprogress></span></p>
+  <h2>Decisions, part 2: how the product behaves</h2>
+  <div class="qgrid mt">
+    <div class="q" data-q="caretaker"><div class="qt"><span class="n">10</span>Is the caretaker a user of the product?</div><div class="opts">
+      <label><input type="radio" value="Full app user">App user</label><label><input type="radio" value="WhatsApp only">WhatsApp only</label><label><input type="radio" value="Owner logs for them">Owner logs for them</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="money"><div class="qt"><span class="n">11</span>Do we ever touch money?</div><div class="opts">
+      <label><input type="radio" value="Track only">Track only</label><label><input type="radio" value="Payment links, never hold funds">Payment links</label><label><input type="radio" value="Licensed partner wallet later">Partner wallet later</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="smart-v1"><div class="qt"><span class="n">12</span>What does "smart" mean in version 1?</div><div class="opts">
+      <label><input type="radio" value="Reminders & nudges">Reminders</label><label><input type="radio" value="Voice + receipt capture">Voice &amp; receipt capture</label><label><input type="radio" value="Farm price suggestions">Farm pricing</label><label><input type="radio" value="Nothing — be reliable">Just be reliable</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="surface"><div class="qt"><span class="n">13</span>Where does the owner use it?</div><div class="opts">
+      <label><input type="radio" value="Native app">Native app</label><label><input type="radio" value="Web app (installable) + WhatsApp">Web app + WhatsApp</label><label><input type="radio" value="WhatsApp first, web back office">WhatsApp first</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="guest"><div class="qt"><span class="n">14</span>What do farm guests get?</div><div class="opts">
+      <label><input type="radio" value="Nothing new — owner still chats">Owner still chats</label><label><input type="radio" value="Booking link with live free shifts">Live availability link</label><label><input type="radio" value="Full checkout with deposit">Full checkout</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="marketplaces"><div class="qt"><span class="n">15</span>Our stance toward Gathern, OpenSooq, Ajirly?</div><div class="opts">
+      <label><input type="radio" value="Ignore">Ignore</label><label><input type="radio" value="Complement (sync calendars)">Complement</label><label><input type="radio" value="Compete for guests">Compete</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="who-pays"><div class="qt"><span class="n">16</span>Who pays for the farm module?</div><div class="opts">
+      <label><input type="radio" value="Owner, monthly">Owner monthly</label><label><input type="radio" value="Owner, per booking">Per booking</label><label><input type="radio" value="Guest fee">Guest fee</label><label><input type="radio" value="Mix by season">Mix by season</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="arabic"><div class="qt"><span class="n">17</span>Language standard?</div><div class="opts">
+      <label><input type="radio" value="Arabic-first, MSA">Arabic-first (MSA)</label><label><input type="radio" value="Arabic-first, Levantine-friendly">Levantine-friendly</label><label><input type="radio" value="Bilingual, equal">Bilingual equal</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+    <div class="q" data-q="informal"><div class="qt"><span class="n">18</span>Many farm owners are cash-only and informal. Do we serve them?</div><div class="opts">
+      <label><input type="radio" value="Yes — cash is first-class">Yes, cash is first-class</label><label><input type="radio" value="Only those willing to track">Only if they track</label><label><input type="radio" value="Licensed/formal only">Formal only</label></div><textarea class="other" rows="1" placeholder="Note…"></textarea></div>
+  </div>
+</section>
+
+<section class="slide" id="ask-farm" data-section="Decide" data-title="About Loujane's farm">
+  <p class="kicker">For Loujane: your farm, in detail (every answer shapes the product)</p>
+  <h2>Your farm today</h2>
+  <div class="qgrid mt" style="grid-template-columns:repeat(4,1fr)">
+    <div class="q" data-q="farm-where"><div class="qt">Where is it? Is the busy season summer, winter, or both?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="farm-shifts"><div class="qt">Exact day, night and 24h times? Different on Fridays or in Ramadan?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="farm-prices"><div class="qt">Current prices: weekday, Thu, Fri, Sat, Eid? Extra-guest fee?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="farm-deposits"><div class="qt">How big is the <span class="ar">عربون</span>, how is it paid, and when is it kept? How much is the <span class="ar">تأمين</span>?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="farm-rules"><div class="qt">Who's allowed (families, women-only, youth)? Events? Max guests, quiet hours?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="farm-staff"><div class="qt">Who's on site? How are they paid? Who checks the farm at checkout?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="farm-channels"><div class="qt">Where do bookings come from? Brokers, and their cut? Who else can confirm a booking?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="farm-calendar"><div class="qt">How do you track bookings now? Ever been double-booked, or had a no-show?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="farm-damage"><div class="qt">Last damage dispute? What usually breaks?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="farm-costs"><div class="qt">Water (mains or tanker), gas, power or generator, pool upkeep: what does it cost per month?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="farm-legal"><div class="qt">Any municipal, Civil Defence or Health approvals? Is the income declared?</div><textarea class="other" rows="1" placeholder="Answer… (stays on this computer)"></textarea></div>
+    <div class="q" data-q="farm-wish"><div class="qt">If one thing about the farm ran itself tomorrow, what would it be?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+  </div>
+</section>
+
+<section class="slide" id="ask-flats" data-section="Decide" data-title="About Loujane's flats">
+  <p class="kicker">For Loujane: your flats</p>
+  <h2>Your flats today, and who we could talk to</h2>
+  <div class="qgrid mt">
+    <div class="q" data-q="flats-list"><div class="qt">How many flats, where, and which are furnished?</div><textarea class="other" rows="1" placeholder="e.g. 2 Manama furnished, 3 Amman unfurnished…"></textarea></div>
+    <div class="q" data-q="flats-pay"><div class="qt">How do tenants pay in Bahrain and in Jordan? Transfer, CliQ, cash to someone, cheques?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="flats-register"><div class="qt">Are the Bahrain leases registered? Whose name are electricity and water (EWA) in?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="flats-ground"><div class="qt">Who helps on the ground in each country, and do they mind being "in the system"?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="flats-pain"><div class="qt">The worst rental headache of the past 12 months?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="flats-tools"><div class="qt">What do you use today: Excel, notes, WhatsApp groups? Ever paid for a tool?</div><textarea class="other" rows="1" placeholder="Answer…"></textarea></div>
+    <div class="q" data-q="interview-farm" style="grid-column:span 3"><div class="qt">Farm owners we could interview (aim: 15; names or how to reach them)</div><textarea class="other" rows="1" placeholder="e.g. neighbour in Jerash, broker X's farms, cousin's friend…"></textarea></div>
+    <div class="q" data-q="interview-diaspora" style="grid-column:span 3"><div class="qt">People in the Gulf who own rented property back home (aim: 10–15)</div><textarea class="other" rows="1" placeholder="Names or groups…"></textarea></div>
+  </div>
+</section>
+
+<section class="slide" id="next" data-section="Decide" data-title="Next steps">
+  <p class="kicker">What happens next</p>
+  <h2>Next steps, and how to send your answers back</h2>
+  <div class="cols c2 mt">
+    <div>
+      <ul class="ticks" style="font-size:21px">
+        <li><b>Go through this deck together</b>, answer the decisions and portfolio questions, and add notes on any slide.</li>
+        <li>Tap <b>Send answers</b>. It opens WhatsApp with a summary plus a link that carries every answer. Send it to Subhi, who folds it into outline v0.2.</li>
+        <li><b>Loujane: 30 minutes with BaiTech and Ajirly.</b> What's missing for your flats and farm?</li>
+        <li><b>Start 3 conversations</b> with farm owners using the rules on the right. I'll write an Arabic interview script next round.</li>
+        <li><b>Ask a Jordanian lawyer</b> one question: what approval does a rented farm with a pool need in 2026?</li>
+      </ul>
+      <div style="display:flex;gap:12px" class="mt">
+        <button class="btn" data-export style="font-size:18px;padding:12px 22px;border-radius:999px;border:0;background:var(--ink);color:#fff">Send answers</button>
+        <button class="btn" data-reset style="font-size:16px;padding:12px 18px;border-radius:999px;border:1px solid var(--line);background:var(--pearl)">Clear saved answers</button>
+      </div>
+    </div>
+    <div class="panel saffron"><h3>How to interview without fooling yourself</h3>
+      <ul class="ticks" style="font-size:18px">
+        <li>Don't mention the app. Say: "I'm trying to understand how farm owners handle bookings."</li>
+        <li>Ask about <b>the last time</b>: "Tell me about your last double-booking / deposit fight."</li>
+        <li>Ask what they <b>already pay for or have built</b> (brokers, ads, a notebook system). That's real signal.</li>
+        <li>Never ask "would you use…?" Everyone says yes to be polite.</li>
+        <li>"Interesting!" means nothing. Money spent and time lost mean something.</li>
+        <li>End with: "Who else should I talk to?"</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="glossary" data-section="Decide" data-title="Glossary">
+  <p class="kicker">Reference</p>
+  <h2>Glossary</h2>
+  <div class="cols c3 mt" style="gap:8px 40px;font-size:18px">
+    <table class="grid">
+      <tr><td class="ar" style="font-size:21px">مزرعة سياحية</td><td>Tourist farm, rented by shift</td></tr>
+      <tr><td class="ar" style="font-size:21px">شاليه · استراحة</td><td>Chalet · Saudi rest house</td></tr>
+      <tr><td class="ar" style="font-size:21px">فترة صباحية · مسائية</td><td>Day shift · evening shift</td></tr>
+      <tr><td class="ar" style="font-size:21px">مبيت · يوم كامل</td><td>Overnight · full 24h</td></tr>
+      <tr><td class="ar" style="font-size:21px">عربون</td><td>Booking deposit (holds the date)</td></tr>
+      <tr><td class="ar" style="font-size:21px">تأمين مسترد</td><td>Refundable damage deposit</td></tr>
+    </table>
+    <table class="grid">
+      <tr><td class="ar" style="font-size:21px">ناطور · حارس</td><td>Caretaker · guard</td></tr>
+      <tr><td class="ar" style="font-size:21px">عائلات فقط · شباب</td><td>Families only · young men's groups</td></tr>
+      <tr><td class="ar" style="font-size:21px">ديوان · صالة عربي</td><td>Arabic seating hall</td></tr>
+      <tr><td class="ar" style="font-size:21px">صهريج · جرة غاز</td><td>Water tanker · gas cylinder</td></tr>
+      <tr><td class="ar" style="font-size:21px">إنذار عدلي</td><td>Notarial notice (Jordan eviction)</td></tr>
+      <tr><td class="ar" style="font-size:21px">سند تنفيذي</td><td>Enforceable instrument (Ejar lease)</td></tr>
+    </table>
+    <table class="grid">
+      <tr><td>CliQ</td><td>Jordan instant payments</td></tr>
+      <tr><td>Fawri+ · BenefitPay</td><td>Bahrain instant payments</td></tr>
+      <tr><td>Ejar · Ejari · Tawtheeq</td><td>KSA · Dubai · Abu Dhabi lease registries</td></tr>
+      <tr><td>EWA</td><td>Bahrain electricity &amp; water</td></tr>
+      <tr><td>PSP</td><td>Payment provider (Tap, PayTabs…)</td></tr>
+      <tr><td>Fils</td><td>1/1000 of a BHD or JOD</td></tr>
+    </table>
+  </div>
+  <p class="small mt">Full research (about 140k characters, with every source) is in <b>discovery/01-discovery/raw/</b> in the project repo.</p>
+</section>
+
+<footer id="foot">
+  <button class="btn" id="prev" aria-label="Previous slide">Prev</button>
+  <button class="btn" id="next" aria-label="Next slide">Next</button>
+  <div id="bar"><i></i></div>
+  <span id="count">1 / 1</span>
+  <button class="btn" id="tocBtn">Contents</button>
+  <button class="btn" id="noteBtn">Note on this slide</button>
+  <button class="btn" id="sendBtn" style="background:var(--ink);color:#fff;border-color:var(--ink)">Send answers</button>
+  <button class="btn" id="helpBtn" aria-label="Keyboard shortcuts">?</button>
+</footer>
+
+<div id="notes" role="dialog" aria-label="Slide note">
+  <div class="row"><span id="notesFor">Note</span><button class="btn" id="notesClose" style="border:0;background:none">Close</button></div>
+  <textarea id="notesTa" placeholder="What do we think about this slide? Saved automatically on this device."></textarea>
+</div>
+
+<div id="toc" role="dialog" aria-label="Contents">
+  <h2>Contents</h2>
+  <div class="groups"></div>
+</div>
+
+<div id="help">
+  <kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> move · <kbd>T</kbd> contents · <kbd>N</kbd> note on this slide · <kbd>S</kbd> sources · <kbd>E</kbd> send answers · <kbd>Esc</kbd> close
+</div>
+
+</div></div>
+
+<!-- phone bottom bar -->
+<nav id="mbar" aria-label="Deck actions">
+  <button id="mToc">Contents</button>
+  <button id="mQs">Questions<small id="mProg">0 of 0</small></button>
+  <button id="mSend" class="pri">Send answers<small id="mSaved">saved on this phone</small></button>
+</nav>
+
+<!-- viewing someone else's answers -->
+<div id="banner" role="status"><span id="bannerText"></span><button id="bannerKeep" class="alt">Keep on this device</button><button id="bannerClose">Close</button></div>
+
+<!-- send / receive sheet -->
+<div id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="box">
+    <button class="x" id="sheetClose">Close</button>
+    <h3 id="sheetTitle">Send your answers</h3>
+    <p class="small" style="font-size:15px">This creates a message with your answers and a link that opens this deck with all of them filled in. Send it however you like; WhatsApp works best.</p>
+    <div class="stat"><div><b id="stQ">0</b>questions answered</div><div><b id="stC">0</b>slide comments</div></div>
+    <label class="f" for="whoIn">Your name</label>
+    <input type="text" id="whoIn" placeholder="e.g. Loujane" autocomplete="name">
+    <button class="bigbtn wa" id="shareBtn">Send…</button>
+    <button class="bigbtn alt" id="waBtn">Open WhatsApp</button>
+    <button class="bigbtn alt" id="copyBtn">Copy message</button>
+    <button class="bigbtn alt" id="fileBtn">Save as a file</button>
+    <div class="msg" id="sheetMsg"></div>
+    <details>
+      <summary>See the message</summary>
+      <textarea id="preview" rows="8" readonly style="margin-top:10px;font-size:13.5px"></textarea>
+    </details>
+    <details>
+      <summary>Received answers from someone? Open them here</summary>
+      <p class="small" style="font-size:14.5px;margin-top:8px">Tapping the link in their message is easiest. Or paste the whole message here.</p>
+      <textarea id="importTa" rows="4" placeholder="Paste the message you received"></textarea>
+      <button class="bigbtn alt" id="importBtn">Open these answers</button>
+    </details>
+    <details>
+      <summary>Start over</summary>
+      <button class="bigbtn alt" data-reset style="color:var(--pom)">Clear everything saved on this device</button>
+    </details>
+  </div>
+</div>
+
+<script>
+(() => {
+  const KEY = 'mosbah-deck-v1';
+  const isMobile = () => window.matchMedia('(max-width:820px)').matches;
+  const $ = id => document.getElementById(id);
+  const stage = $('stage');
+  const slides = [...document.querySelectorAll('.slide')];
+  const blank = () => ({answers:{}, notes:{}, who:''});
+  const loadOwn = () => { try { return Object.assign(blank(), JSON.parse(localStorage.getItem(KEY) || 'null') || {}); } catch (e) { return blank(); } };
+  let store = loadOwn();
+  let viewing = null;           // set while looking at someone else's answers
+  let cur = 0;
+
+  function save(){
+    if (viewing) return;
+    try {
+      store.updated = new Date().toISOString();
+      localStorage.setItem(KEY, JSON.stringify(store));
+      $('mSaved').textContent = 'saved ✓';
+      clearTimeout(save.t); save.t = setTimeout(() => $('mSaved').textContent = 'saved on this phone', 1500);
+    } catch (e) {
+      $('mSaved').textContent = 'not saving: private mode?';
+    }
+  }
+
+  /* ---- fit stage (desktop) ---- */
+  function fit(){
+    if (isMobile()) { stage.style.transform = 'none'; return; }
+    const s = Math.min(innerWidth/1600, innerHeight/900) * 0.98;
+    stage.style.transform = `scale(${s})`;
+  }
+  addEventListener('resize', fit); fit();
+
+  /* ---- rail + toc ---- */
+  const sections = [];
+  slides.forEach((s,i) => {
+    const sec = s.dataset.section || 'Intro';
+    let g = sections.find(x => x.name === sec);
+    if (!g) { g = {name:sec, first:i, items:[]}; sections.push(g); }
+    g.items.push({i, title: s.dataset.title || ('Slide '+(i+1))});
+  });
+  const rail = $('rail');
+  rail.innerHTML = '<div class="mark" title="Mosbah">م</div>' +
+    sections.map(g => `<button data-go="${g.first}" data-sec="${g.name}"><span class="dot"></span>${g.name}</button>`).join('') + '<div class="spacer"></div>';
+  rail.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(+b.dataset.go); });
+  const toc = $('toc');
+  toc.querySelector('.groups').innerHTML = sections.map(g =>
+    `<div><h3>${g.name}</h3>${g.items.map(it => `<button data-go="${it.i}">${it.i+1}. ${it.title}</button>`).join('')}</div>`).join('');
+  toc.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) { toc.classList.remove('open'); go(+b.dataset.go); } else if (e.target === toc) toc.classList.remove('open'); });
+
+  /* ---- sources buttons + per-slide comment boxes (phone) ---- */
+  slides.forEach(s => {
+    const src = s.querySelector('.src');
+    if (src) {
+      const b = document.createElement('button');
+      b.className = 'src-btn'; b.textContent = 'Sources & confidence';
+      b.addEventListener('click', () => src.classList.toggle('open'));
+      s.appendChild(b);
+    }
+    const mc = document.createElement('div');
+    mc.className = 'mcomment';
+    mc.innerHTML = `<button class="mc-btn">Comment or suggest a change on this slide</button><textarea hidden placeholder="Your thoughts, corrections, ideas… saved automatically"></textarea>`;
+    const ta = mc.querySelector('textarea');
+    mc.querySelector('.mc-btn').addEventListener('click', () => { ta.hidden = !ta.hidden; if (!ta.hidden) ta.focus(); });
+    ta.addEventListener('input', () => setNote(s.id, ta.value));
+    s.appendChild(mc);
+  });
+  function setNote(id, v){ if (v.trim()) store.notes[id] = v; else delete store.notes[id]; save(); syncNoteUI(); }
+
+  /* ---- navigation ---- */
+  const bar = document.querySelector('#bar i'), count = $('count');
+  function go(i, opts = {}){
+    i = Math.max(0, Math.min(slides.length-1, i));
+    slides[cur].classList.remove('active');
+    slides[cur].querySelectorAll('.src.open').forEach(x => x.classList.remove('open'));
+    cur = i; slides[cur].classList.add('active');
+    bar.style.width = ((cur+1)/slides.length*100)+'%';
+    count.textContent = `${cur+1} / ${slides.length}`;
+    const sec = slides[cur].dataset.section || 'Intro';
+    rail.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.sec === sec));
+    toc.querySelectorAll('button').forEach(b => b.classList.toggle('cur', +b.dataset.go === cur));
+    if (!opts.keepHash) history.replaceState(null, '', '#'+(cur+1));
+    if (isMobile() && opts.scroll !== false) slides[cur].scrollIntoView({behavior: opts.instant ? 'auto' : 'smooth', block:'start'});
+    syncNoteUI();
+  }
+  $('prev').onclick = () => go(cur-1);
+  $('next').onclick = () => go(cur+1);
+  $('tocBtn').onclick = $('mToc').onclick = () => toc.classList.toggle('open');
+  $('helpBtn').onclick = () => $('help').classList.toggle('open');
+  $('mQs').onclick = () => { const firstOpen = qs.find(q => !q.classList.contains('done')) || qs[0]; firstOpen.scrollIntoView({behavior:'smooth', block:'center'}); };
+
+  /* ---- desktop slide notes ---- */
+  const notes = $('notes'), ta = $('notesTa'), noteBtn = $('noteBtn');
+  noteBtn.style.position = 'relative';
+  function syncNoteUI(){
+    const id = slides[cur].id;
+    if (document.activeElement !== ta) ta.value = store.notes[id] || '';
+    $('notesFor').textContent = 'Note on: ' + (slides[cur].dataset.title || '');
+    noteBtn.classList.toggle('has-note', !!store.notes[id]);
+  }
+  ta.addEventListener('input', () => setNote(slides[cur].id, ta.value));
+  noteBtn.onclick = () => { notes.classList.toggle('open'); if (notes.classList.contains('open')) ta.focus(); };
+  $('notesClose').onclick = () => notes.classList.remove('open');
+
+  /* ---- tabs ---- */
+  document.querySelectorAll('[data-tabs]').forEach(group => {
+    const btns = [...group.querySelectorAll('.tabs button')], panels = [...group.querySelectorAll('.tabpanel')];
+    btns.forEach((b,i) => { b.setAttribute('role','tab'); b.addEventListener('click', () => {
+      btns.forEach((x,j) => x.setAttribute('aria-selected', j===i)); panels.forEach((p,j) => p.classList.toggle('on', j===i));
+    }); });
+    btns[0]?.click();
+  });
+
+  /* ---- questions ---- */
+  const qs = [...document.querySelectorAll('.q[data-q]')];
+  const grow = el => { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; };
+  qs.forEach(q => {
+    const id = q.dataset.q;
+    q.querySelectorAll('input[type=radio]').forEach(r => {
+      r.name = 'q-'+id;
+      r.addEventListener('change', () => { (store.answers[id] ||= {}).choice = r.value; save(); mark(q); progress(); });
+    });
+    const o = q.querySelector('.other');
+    if (o) o.addEventListener('input', () => { (store.answers[id] ||= {}).note = o.value; grow(o); save(); mark(q); progress(); });
+  });
+  function mark(q){ const a = store.answers[q.dataset.q]; q.classList.toggle('done', !!(a && (a.choice || (a.note||'').trim()))); }
+  function progress(){
+    const done = qs.filter(q => q.classList.contains('done')).length;
+    document.querySelectorAll('[data-qprogress]').forEach(el => el.textContent = `${done} of ${qs.length} answered`);
+    $('mProg').textContent = `${done} of ${qs.length}`;
+    return done;
+  }
+
+  /* ---- paint everything from the store ---- */
+  function renderAll(){
+    qs.forEach(q => {
+      const a = store.answers[q.dataset.q] || {};
+      q.querySelectorAll('input[type=radio]').forEach(r => r.checked = (a.choice === r.value));
+      const o = q.querySelector('.other'); if (o) { o.value = a.note || ''; requestAnimationFrame(() => grow(o)); }
+      mark(q);
+    });
+    slides.forEach(s => {
+      const mc = s.querySelector('.mcomment'); const v = store.notes[s.id] || '';
+      mc.querySelector('textarea').value = v; mc.classList.toggle('has', !!v);
+      if (v) mc.querySelector('textarea').hidden = false;
+    });
+    progress(); syncNoteUI();
+  }
+
+  /* ---- encode / decode answers for links ---- */
+  const toB64u = bytes => { let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i+0x8000)); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); };
+  const fromB64u = str => { str = str.replace(/-/g,'+').replace(/_/g,'/'); while (str.length % 4) str += '='; const b = atob(str); const u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
+  async function encode(obj){
+    const json = new TextEncoder().encode(JSON.stringify(obj));
+    if (window.CompressionStream) {
+      try { const st = new Blob([json]).stream().pipeThrough(new CompressionStream('deflate-raw')); return 'z.' + toB64u(new Uint8Array(await new Response(st).arrayBuffer())); } catch (e) {}
+    }
+    return 'j.' + toB64u(json);
+  }
+  async function decode(code){
+    let bytes = fromB64u(code.slice(2));
+    if (code[0] === 'z') { const st = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')); bytes = new Uint8Array(await new Response(st).arrayBuffer()); }
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }
+  const findCode = text => { const m = /(?:#answers=|MOSBAH1:)([zj]\.[A-Za-z0-9_-]+)/.exec(text || ''); return m && m[1]; };
+  const hosted = () => /^https?:$/.test(location.protocol);
+
+  /* ---- the message ---- */
+  const clean = el => el.innerText.replace(/\s+/g,' ').trim();
+  function readable(){
+    const who = (store.who || '').trim() || 'someone';
+    const d = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+    const done = qs.filter(q => q.classList.contains('done'));
+    let t = `Mosbah answers from ${who} (${d})\n${done.length} of ${qs.length} questions answered · ${Object.keys(store.notes).length} slide comments\n`;
+    let lastSlide = null;
+    done.forEach(q => {
+      const s = q.closest('.slide'); const a = store.answers[q.dataset.q];
+      if (s !== lastSlide) { t += `\n▸ ${s.dataset.title}\n`; lastSlide = s; }
+      const qt = clean(q.querySelector('.qt')).replace(/^(\d+)(?=\D)/, '$1. ');
+      t += `• ${qt}\n   → ${[a.choice, (a.note||'').trim()].filter(Boolean).join(' — ')}\n`;
+    });
+    const ns = slides.filter(s => store.notes[s.id]);
+    if (ns.length) { t += `\n▸ Comments on slides\n`; ns.forEach(s => t += `• ${s.dataset.title}: ${store.notes[s.id].trim()}\n`); }
+    return t;
+  }
+  async function buildMessage(){
+    const code = await encode({v:1, who:store.who||'', at:new Date().toISOString(), answers:store.answers, notes:store.notes});
+    const link = hosted() ? `${location.origin}${location.pathname}#answers=${code}` : null;
+    const tail = link ? `\nOpen all answers in the deck:\n${link}\n` : `\nAnswer code (paste into the deck's "Open them here" box):\nMOSBAH1:${code}\n`;
+    return {full: readable() + tail, short: `Mosbah answers from ${(store.who||'').trim() || 'someone'}: ${progress()} of ${qs.length} answered.` + tail, code};
+  }
+
+  /* ---- sheet ---- */
+  const sheet = $('sheet'), msg = $('sheetMsg');
+  let current = null;
+  async function openSheet(){
+    if (viewing) { msg.textContent = 'You are viewing someone else\'s answers. Close that view first.'; }
+    else msg.textContent = '';
+    $('stQ').textContent = progress(); $('stC').textContent = Object.keys(store.notes).length;
+    $('whoIn').value = store.who || '';
+    sheet.classList.add('open');
+    current = await buildMessage(); $('preview').value = current.full;
+  }
+  const closeSheet = () => sheet.classList.remove('open');
+  $('sendBtn').onclick = $('mSend').onclick = openSheet;
+  document.querySelectorAll('[data-export]').forEach(b => b.onclick = openSheet);
+  $('sheetClose').onclick = closeSheet;
+  sheet.addEventListener('click', e => { if (e.target === sheet) closeSheet(); });
+  $('whoIn').addEventListener('input', async e => { store.who = e.target.value; save(); current = await buildMessage(); $('preview').value = current.full; });
+
+  $('shareBtn').onclick = async () => {
+    current = await buildMessage();
+    if (navigator.share) {
+      try { await navigator.share({title:'Mosbah answers', text: current.full}); msg.textContent = 'Shared.'; return; }
+      catch (e) { if (e.name === 'AbortError') return; }
+    }
+    await copy(current.full);
+  };
+  $('waBtn').onclick = async () => {
+    current = await buildMessage();
+    const text = current.full.length < 3500 ? current.full : current.short;
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  };
+  async function copy(text){
+    try { await navigator.clipboard.writeText(text); msg.textContent = 'Copied. Paste it into WhatsApp or email.'; }
+    catch (e) { const p = $('preview'); p.closest('details').open = true; p.focus(); p.select(); msg.textContent = 'Select-all is on. Use Copy from your keyboard menu.'; }
+  }
+  $('copyBtn').onclick = async () => { current = await buildMessage(); copy(current.full); };
+  $('fileBtn').onclick = async () => {
+    current = await buildMessage();
+    const name = `mosbah-answers-${(store.who||'').trim().toLowerCase().replace(/\s+/g,'-') || 'answers'}-${new Date().toISOString().slice(0,10)}.txt`;
+    const file = new File([current.full], name, {type:'text/plain'});
+    if (navigator.canShare && navigator.canShare({files:[file]})) {
+      try { await navigator.share({files:[file], title:'Mosbah answers'}); return; } catch (e) { if (e.name === 'AbortError') return; }
+    }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; a.click();
+    msg.textContent = 'Saved ' + name;
+  };
+
+  /* ---- receiving answers ---- */
+  async function openReceived(code){
+    try {
+      const p = await decode(code);
+      viewing = p;
+      store = Object.assign(blank(), {answers:p.answers || {}, notes:p.notes || {}, who:p.who || ''});
+      renderAll();
+      const d = p.at ? new Date(p.at).toLocaleString('en-GB', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
+      $('bannerText').textContent = `Viewing ${p.who || 'someone'}'s answers${d ? ' · sent ' + d : ''}`;
+      $('banner').classList.add('on');
+      closeSheet();
+      return true;
+    } catch (e) { msg.textContent = 'That answer link looks incomplete. Ask for it to be sent again.'; return false; }
+  }
+  $('importBtn').onclick = () => { const c = findCode($('importTa').value); if (c) openReceived(c); else msg.textContent = 'No answers found in that text.'; };
+  $('bannerClose').onclick = () => { viewing = null; store = loadOwn(); renderAll(); $('banner').classList.remove('on'); history.replaceState(null, '', '#'+(cur+1)); };
+  $('bannerKeep').onclick = () => {
+    try { const own = localStorage.getItem(KEY); if (own) localStorage.setItem(KEY + '-backup-' + Date.now(), own); } catch (e) {}
+    viewing = null; save(); $('banner').classList.remove('on');
+    $('bannerText').textContent = '';
+  };
+  document.querySelectorAll('[data-reset]').forEach(b => b.onclick = () => {
+    if (confirm('Clear all answers and comments saved on this device?')) { try { localStorage.removeItem(KEY); } catch (e) {} store = blank(); viewing = null; renderAll(); closeSheet(); }
+  });
+
+  /* ---- shift dial ---- */
+  const dial = $('dial');
+  if (dial) {
+    const presets = {
+      classic:{shifts:[{n:'Day shift · 90 JOD',a:9,b:19,c:'#D99A1E'},{n:'Night shift · 80 JOD',a:21,b:32,c:'#0F3B3A'}]},
+      jerash:{shifts:[{n:'Day shift',a:11,b:21,c:'#D99A1E'},{n:'Night shift',a:23,b:33,c:'#0F3B3A'}]},
+      full:{shifts:[{n:'24-hour booking',a:10,b:33,c:'#6E7F2A'}]},
+      bahrain:{shifts:[{n:'Morning period',a:8,b:16,c:'#E8B54A'},{n:'Evening period',a:17,b:25,c:'#2D6E8E'}]}
+    };
+    const R = 200, cx = 260, cy = 260;
+    const pt = (h,r) => { const ang = (h/24)*2*Math.PI - Math.PI/2; return [cx + r*Math.cos(ang), cy + r*Math.sin(ang)]; };
+    function arc(a,b,r1,r2){
+      const large = (b-a) > 12 ? 1 : 0;
+      const [x1,y1]=pt(a,r2),[x2,y2]=pt(b,r2),[x3,y3]=pt(b,r1),[x4,y4]=pt(a,r1);
+      return `M${x1},${y1} A${r2},${r2} 0 ${large} 1 ${x2},${y2} L${x3},${y3} A${r1},${r1} 0 ${large} 0 ${x4},${y4}Z`;
+    }
+    const fmt = h => { h = ((h%24)+24)%24; const hh = Math.floor(h), mm = Math.round((h-hh)*60); return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`; };
+    function draw(key){
+      const p = presets[key]; let s = '';
+      s += `<circle cx="${cx}" cy="${cy}" r="${R+28}" fill="#F8F9F6" stroke="#C5D0CA"/>`;
+      s += `<path d="${arc(18.5,30,R-70,R+26)}" fill="#0F3B3A" opacity=".06"/>`;
+      s += `<path d="${arc(0,23.999,R-56,R)}" fill="#F3DADD"/>`;
+      p.shifts.forEach(x => { s += `<path d="${arc(x.a,x.b,R-56,R)}" fill="${x.c}"><title>${x.n}: ${fmt(x.a)}–${fmt(x.b)}</title></path>`; });
+      for (let h = 0; h < 24; h++){
+        const [x1,y1]=pt(h,R+4),[x2,y2]=pt(h,R+(h%6?10:18));
+        s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#3E5F5C" stroke-width="${h%6?1:2}"/>`;
+        if (h%3===0){ const [tx,ty]=pt(h,R+40); s += `<text x="${tx}" y="${ty+6}" text-anchor="middle" font-size="17" fill="#3E5F5C" font-family="IBM Plex Sans Arabic">${String(h).padStart(2,'0')}</text>`; }
+      }
+      s += `<text x="${cx}" y="${cy-8}" text-anchor="middle" font-family="Alexandria" font-weight="800" font-size="30" fill="#0F3B3A">${p.shifts.length} sellable</text>`;
+      s += `<text x="${cx}" y="${cy+24}" text-anchor="middle" font-family="IBM Plex Sans Arabic" font-size="18" fill="#3E5F5C">units per day</text>`;
+      dial.innerHTML = s;
+      $('dialList').innerHTML = p.shifts.map(x => `<li><i style="background:${x.c}"></i><b>${x.n}</b> ${fmt(x.a)} → ${fmt(x.b)}</li>`).join('') +
+        `<li><i style="background:#F3DADD;border:1px solid #E3B5BB"></i><b>Turnover gap</b> cleaning, pool check, caretaker inspection</li>`;
+      document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-selected', b.dataset.preset === key));
+    }
+    document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => draw(b.dataset.preset));
+    draw('classic');
+  }
+
+  /* ---- keyboard (desktop) ---- */
+  addEventListener('keydown', e => {
+    if (e.target.matches('textarea, input')) { if (e.key === 'Escape') e.target.blur(); return; }
+    if (sheet.classList.contains('open')) { if (e.key === 'Escape') closeSheet(); return; }
+    const k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(cur+1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(cur-1); }
+    else if (k === 'Home') go(0); else if (k === 'End') go(slides.length-1);
+    else if (k === 't' || k === 'T') toc.classList.toggle('open');
+    else if (k === 'n' || k === 'N') { e.preventDefault(); noteBtn.click(); }
+    else if (k === 's' || k === 'S') slides[cur].querySelector('.src')?.classList.toggle('open');
+    else if (k === 'e' || k === 'E') openSheet();
+    else if (k === '?') $('help').classList.toggle('open');
+    else if (k === 'Escape') { toc.classList.remove('open'); notes.classList.remove('open'); $('help').classList.remove('open'); slides[cur].querySelector('.src')?.classList.remove('open'); }
+  });
+
+  /* swipe (desktop stage on touch laptops/tablets) */
+  let sx = null;
+  stage.addEventListener('touchstart', e => { if (!isMobile()) sx = e.touches[0].clientX; }, {passive:true});
+  stage.addEventListener('touchend', e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 60 && !e.target.closest('textarea,input,label,button,table')) go(cur + (dx < 0 ? 1 : -1)); sx = null; });
+
+  /* phone: track which slide is on screen */
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => { if (!isMobile()) return; es.forEach(en => { if (en.isIntersecting) { const i = slides.indexOf(en.target); if (i !== cur) go(i, {scroll:false}); } }); }, {rootMargin:'-45% 0px -50% 0px'});
+    slides.forEach(s => io.observe(s));
+  }
+
+  /* ---- start ---- */
+  renderAll();
+  slides[0].classList.add('active');
+  const code = findCode(location.hash);
+  const start = parseInt(location.hash.slice(1), 10);
+  go(Number.isFinite(start) ? start-1 : 0, {instant:true, scroll: Number.isFinite(start), keepHash: !!code});
+  if (code) openReceived(code);
+})();
+</script>
+</body>
+</html>
